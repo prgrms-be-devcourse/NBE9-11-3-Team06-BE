@@ -11,38 +11,38 @@ import java.time.LocalTime
 
 @Entity
 class Meeting : BaseEntity() {
-    private var title: String? = null
-    private var category: String? = null
+    var title: String? = null
+    var category: String? = null
 
     @Column(name = "local_time")
-    private var localTime: String? = null
+    var localTime: String? = null
 
     @Enumerated(EnumType.STRING)
-    private var status: MeetingStatus? = null
+    var status: MeetingStatus? = null
 
     @Column(name = "random_url")
-    private var randomUrl: String? = null
+    var randomUrl: String? = null
 
-    private var duration: Int? = null
+    var duration: Int? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private var member: Member? = null
+    var member: Member? = null
 
-    private var confirmedDate: LocalDate? = null
-    private var confirmedTime: LocalTime? = null
-
-    @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
-    private val participants: MutableList<Participant> = mutableListOf()
+    var confirmedDate: LocalDate? = null
+    var confirmedTime: LocalTime? = null
 
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
-    private val meetingsDates: MutableList<MeetingsDate> = mutableListOf()
+    val participants: MutableList<Participant> = mutableListOf()
 
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
-    private val timeBlocks: MutableList<TimeBlock> = mutableListOf()
+    val meetingsDates: MutableList<MeetingsDate> = mutableListOf()
 
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
-    private val timeTables: MutableList<TimeTable> = mutableListOf()
+    val timeBlocks: MutableList<TimeBlock> = mutableListOf()
+
+    @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
+    val timeTables: MutableList<TimeTable> = mutableListOf()
 
     fun confirm(date: LocalDate, time: LocalTime) {
         this.confirmedDate = date

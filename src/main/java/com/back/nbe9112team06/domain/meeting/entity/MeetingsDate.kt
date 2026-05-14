@@ -8,15 +8,15 @@ import java.time.LocalDate
 class MeetingsDate : BaseEntity() {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id")
-    private var meeting: Meeting? = null
+    var meeting: Meeting? = null
 
-    private var date: LocalDate? = null
+    var date: LocalDate? = null
 
     @Column(name = "created_by")
-    private var createdBy: String? = null
+    var createdBy: String? = null
 
     @Column(name = "modified_by")
-    private var modifiedBy: String? = null
+    var modifiedBy: String? = null
 
     fun assignMeeting(meeting: Meeting) {
         this.meeting = meeting

@@ -7,6 +7,6 @@ import java.time.LocalTime
 data class FinalizeRequest(
     val date: LocalDate,
 
-    @field:JsonFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:mm")
     val time: LocalTime
 )

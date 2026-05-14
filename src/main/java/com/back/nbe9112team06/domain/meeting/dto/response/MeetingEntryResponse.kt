@@ -12,7 +12,7 @@ data class MeetingEntryResponse(
     val duration: Int,
     val status: MeetingStatus,
     val roomUrl: String,
-    val dates: MutableList<LocalDate>,
+    val dates: List<LocalDate>,
     val createdAt: LocalDateTime,
     val confirmedDate: LocalDate?,
     val confirmedTime: LocalTime?

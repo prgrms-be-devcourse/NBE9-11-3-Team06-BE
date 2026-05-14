@@ -4,6 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "방장 여부 확인 응답 DTO")
 data class HostCheckResponse(
-    @field:Schema(description = "방장 여부 (true: 방장, false: 일반 참가자)", example = "true")
+    @Schema(description = "방장 여부 (true: 방장, false: 일반 참가자)", example = "true")
     val isHost: Boolean
 ) 
