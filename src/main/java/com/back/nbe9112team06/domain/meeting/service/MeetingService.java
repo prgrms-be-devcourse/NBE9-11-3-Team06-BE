@@ -1,7 +1,7 @@
 package com.back.nbe9112team06.domain.meeting.service;
 
-import com.back.nbe9112team06.domain.meeting.dto.ConfirmedScheduleResponse;
-import com.back.nbe9112team06.domain.meeting.dto.FinalizeRequest;
+import com.back.nbe9112team06.domain.meeting.dto.response.ConfirmedScheduleResponse;
+import com.back.nbe9112team06.domain.meeting.dto.request.FinalizeRequest;
 import com.back.nbe9112team06.domain.meeting.dto.request.MeetingCreateRequest;
 import com.back.nbe9112team06.domain.meeting.dto.response.MeetingCreateResponse;
 import com.back.nbe9112team06.domain.meeting.dto.response.MeetingEntryResponse;
@@ -41,14 +41,14 @@ public class MeetingService {
 
         String randomUrl = generateUniqueUrl();
         Meeting meeting = Meeting.create(
-                request.title(),
-                request.category(),
-                request.duration(),
+                request.title,
+                request.category,
+                request.duration,
                 member,
                 randomUrl
         );
 
-        for (LocalDate date : request.dates()) {
+        for (LocalDate date : request.dates) {
             MeetingsDate meetingsDate = MeetingsDate.create(date, member.getEmail());
             meeting.addMeetingsDate(meetingsDate);
         }
@@ -115,8 +115,8 @@ public class MeetingService {
             throw new BusinessException(ErrorCode.ALREADY_CONFIRMED);
         }
 
-        meeting.confirm(request.date(), request.time());
-        return ConfirmedScheduleResponse.from(request.date(), request.time(), MeetingStatus.CONFIRMED, meeting.getTitle(), meeting.getDuration());
+        meeting.confirm(request.date, request.time);
+        return ConfirmedScheduleResponse.from(request.date, request.time, MeetingStatus.CONFIRMED, meeting.getTitle(), meeting.getDuration());
     }
 
     @Transactional

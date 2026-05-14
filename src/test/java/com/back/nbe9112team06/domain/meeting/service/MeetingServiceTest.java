@@ -1,7 +1,7 @@
 package com.back.nbe9112team06.domain.meeting.service;
 
-import com.back.nbe9112team06.domain.meeting.dto.ConfirmedScheduleResponse;
-import com.back.nbe9112team06.domain.meeting.dto.FinalizeRequest;
+import com.back.nbe9112team06.domain.meeting.dto.response.ConfirmedScheduleResponse;
+import com.back.nbe9112team06.domain.meeting.dto.request.FinalizeRequest;
 import com.back.nbe9112team06.domain.meeting.dto.response.MeetingEntryResponse;
 import com.back.nbe9112team06.domain.meeting.entity.Meeting;
 import com.back.nbe9112team06.domain.meeting.entity.MeetingStatus;
@@ -79,10 +79,10 @@ class MeetingServiceTest {
 
         ConfirmedScheduleResponse response = meetingService.confirm(MEETING_ID, HOST_MEMBER_ID, request);
 
-        assertThat(response.status()).isEqualTo(MeetingStatus.CONFIRMED);
-        assertThat(response.date()).isEqualTo(LocalDate.of(2026, 4, 20));
-        assertThat(response.time()).isEqualTo(LocalTime.of(14, 0));
-        assertThat(response.message()).contains("2026-04-20", "14:00");
+        assertThat(response.status).isEqualTo(MeetingStatus.CONFIRMED);
+        assertThat(response.date).isEqualTo(LocalDate.of(2026, 4, 20));
+        assertThat(response.time).isEqualTo(LocalTime.of(14, 0));
+        assertThat(response.message).contains("2026-04-20", "14:00");
         assertThat(meeting.getStatus()).isEqualTo(MeetingStatus.CONFIRMED);
     }
 
@@ -209,8 +209,8 @@ class MeetingServiceTest {
         List<MeetingEntryResponse> result = meetingService.getMyMeetings(HOST_MEMBER_ID);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).title()).isEqualTo("내 모임");
-        assertThat(result.get(0).title()).isNotEqualTo("다른 사람 모임");
+        assertThat(result.get(0).title).isEqualTo("내 모임");
+        assertThat(result.get(0).title).isNotEqualTo("다른 사람 모임");
     }
 
     @Test
