@@ -14,6 +14,14 @@ VALUES
 (2, '회의2', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url2', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (3, '회의3', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url3', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+INSERT INTO time_table (id, meeting_id)
+VALUES (1, 1);
+
+INSERT INTO time_table (id, meeting_id)
+VALUES (2, 2);
+
+INSERT INTO time_table (id, meeting_id)
+VALUES (3, 3);
 -- =========================
 -- 2️⃣ PARTICIPANT
 -- =========================

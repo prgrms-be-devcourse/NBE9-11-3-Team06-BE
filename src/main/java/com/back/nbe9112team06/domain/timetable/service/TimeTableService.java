@@ -1,8 +1,6 @@
 package com.back.nbe9112team06.domain.timetable.service;
 
 import com.back.nbe9112team06.domain.adjustresult.entity.AdjustResult;
-import com.back.nbe9112team06.domain.meeting.entity.Meeting;
-import com.back.nbe9112team06.domain.meeting.service.MeetingService;
 import com.back.nbe9112team06.domain.timeblock.entity.AvailableDateTime;
 import com.back.nbe9112team06.domain.timeblock.entity.AvailableTime;
 import com.back.nbe9112team06.domain.timeblock.entity.TimeBlock;
@@ -17,8 +15,6 @@ import com.back.nbe9112team06.domain.timetable.entity.TimeTable;
 import com.back.nbe9112team06.domain.timetable.repository.TimeTableRepository;
 import com.back.nbe9112team06.global.error.ErrorCode;
 import com.back.nbe9112team06.global.exception.BusinessException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +28,7 @@ import java.util.*;
 /**
  * 현재 타 도메인의 JpaRepository 메서드를 그대로 사용 중
  * merge 이후 각 Service의 메서드로 수정 필요
+ * meeting 생성시 빈 timetable 생성되도록 하기
  */
 @Service
 @RequiredArgsConstructor
@@ -39,19 +36,17 @@ public class TimeTableService {
 
     private final TimeTableRepository timeTableRepository;
     private final TimeBlockRepository timeBlockRepository;
-    private final MeetingService meetingService;
 
-    @PersistenceContext
-    private EntityManager em;
-
-    // 개인 가능일정 통합 (완전히 삭제하고 새로 채우기)
+    // 개인 가능일정 통합
     @Transactional
     public void aggregate(Integer meetingId) {
 
-        Meeting meeting = meetingService.getMeetingOrThrow(meetingId);
+        TimeTable timeTable =
+                timeTableRepository.findByMeetingIdForUpdate(meetingId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        //기존 타임테이블 제거 후 생성, orphanRemoval
-        deleteAllByMeetingId(meetingId);
+
+        timeTable.getDateInfos().clear();
 
         //해당 모임의 타임블록들 꺼내서 Map에 저장
         List<TimeBlock> timeBlocks = findWithAll(meetingId);
@@ -80,7 +75,7 @@ public class TimeTableService {
 
         //Meeting meeting = meetingRepository.findById(meetingId);
         //Meeting meeting = em.getReference(Meeting.class, meetingId);
-        TimeTable timeTable = new TimeTable(meeting, new ArrayList<>());
+        //TimeTable timeTable = new TimeTable(meeting, new ArrayList<>());
 
         //key: 날짜   value: 시간당 이름 Map
         Map<LocalDate, List<Map.Entry<LocalDateTime, List<String>>>> dateMap = new HashMap<>();
@@ -123,6 +118,10 @@ public class TimeTableService {
     public List<TimeTable> findByMeetingId(Integer meetingId) {
 
         return timeTableRepository.findByMeeting_Id(meetingId);
+    }
+     // timetable 저장
+    public void save(TimeTable timeTable){
+        timeTableRepository.save(timeTable);
     }
 
     // 해당 모임의 TimeTable 초기화
@@ -267,5 +266,6 @@ public class TimeTableService {
         groups.add(current);
         return groups;
     }
+
 
 }

@@ -14,8 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 public class TimeTable extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "meeting_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "meeting_id", unique = true)
     private Meeting meeting;
 
     @OneToMany(mappedBy = "timeTable", cascade = CascadeType.ALL, orphanRemoval = true)

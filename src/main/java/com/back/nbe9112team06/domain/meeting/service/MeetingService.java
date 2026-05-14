@@ -11,6 +11,8 @@ import com.back.nbe9112team06.domain.meeting.entity.MeetingsDate;
 import com.back.nbe9112team06.domain.meeting.repository.MeetingRepository;
 import com.back.nbe9112team06.domain.member.entity.Member;
 import com.back.nbe9112team06.domain.member.service.MemberService;
+import com.back.nbe9112team06.domain.timetable.entity.TimeTable;
+import com.back.nbe9112team06.domain.timetable.service.TimeTableService;
 import com.back.nbe9112team06.global.error.ErrorCode;
 import com.back.nbe9112team06.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,6 +33,7 @@ public class MeetingService {
 
     private final MeetingRepository meetingRepository;
     private final MemberService memberService;
+    private final TimeTableService timeTableService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     // ── 모임 생성 ──────────────────────────────
@@ -54,6 +58,10 @@ public class MeetingService {
         }
 
         Meeting saved = meetingRepository.save(meeting);
+
+        TimeTable timeTable = new TimeTable(meeting, new ArrayList<>());
+        timeTableService.save(timeTable);
+
         return new MeetingCreateResponse(saved.getId(), saved.getRandomUrl());
     }
 
