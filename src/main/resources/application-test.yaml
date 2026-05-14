@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+
+springdoc:
+  api-docs:
+    enabled: false
+
+logging:
+  level:
+    org.hibernate.sql: debug
+    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.orm.jdbc.extract: trace
+    org.springframework.transaction.interceptor: trace
+
+jwt:
+  secret: ${TEST_JWT_SECRET:pcGe4Ipx+Vewx7yR7AWrJjvukwfWmmYw+xc7dujkcRdJ9DiEbCy0TbJr03mJmSnc}
+  access-token-expire-seconds: 3600
+
+app:
+  cookie:
+    secure: false    # 테스트 환경 HTTP (HTTPS 불필요)
+    name: accessToken
+    max-age: 3600

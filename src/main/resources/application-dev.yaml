@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:h2:./db_dev;MODE=MySQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+springdoc:
+  api-docs:
+    enabled: true
+  default-produces-media-type: application/json; charset=UTF-8
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.springframework.transaction.interceptor: TRACE
+
+jwt:
+  secret: 80a6ecf58902e88e8995c5f6fe589302eae705b47539562b430bb0e00485dbca133af7c59b770cc9a8ad4ee5f8219c873e366ce37d40d6ca142fd57ffda3f043
+  access-token-expire-seconds: 3600
+
+app:
+  cookie:
+    secure: true
