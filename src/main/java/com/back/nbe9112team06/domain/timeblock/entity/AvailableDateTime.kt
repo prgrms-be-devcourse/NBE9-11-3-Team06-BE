@@ -12,36 +12,34 @@ import jakarta.persistence.OneToMany
 import java.time.LocalDate
 
 @Entity
-class AvailableDateTime : BaseEntity() {
+class AvailableDateTime(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "time_block_id")
-    var timeBlock: TimeBlock? = null
-        protected set
+    var timeBlock: TimeBlock,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id")
-    var meeting: Meeting? = null
-        protected set
+    var meeting: Meeting,
 
-    var date: LocalDate? = null
-        protected set
+    var date: LocalDate,
+
+    @Column(name = "created_by")
+    var createdBy: String,
+
+    ) : BaseEntity() {
 
     @OneToMany(mappedBy = "availableDateTime", cascade = [CascadeType.ALL], orphanRemoval = true)
     val availableTimes: MutableList<AvailableTime> = mutableListOf()
 
-    @Column(name = "created_by")
-    var createdBy: String? = null
-        protected set
-
     companion object {
         @JvmStatic
         fun create(timeBlock: TimeBlock, meeting: Meeting, date: LocalDate): AvailableDateTime =
-            AvailableDateTime().apply {
-                this.timeBlock = timeBlock
-                this.meeting = meeting
-                this.date = date
-                this.createdBy = timeBlock.participant?.guestName
-            }
+            AvailableDateTime(
+                timeBlock = timeBlock,
+                meeting = meeting,
+                date = date,
+                createdBy = timeBlock.participant.guestName,
+            )
     }
 }
