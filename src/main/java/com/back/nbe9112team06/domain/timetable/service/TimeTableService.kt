@@ -148,7 +148,7 @@ class TimeTableService(
             for (timeInfo in dateInfo.timeInfos) {
 
                 val participants = timeInfo.adjustResultList
-                    .map { it?.name }
+                    .map { it.name }
 
                 timeResponses.add(
                     TimeResponse(
