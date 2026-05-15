@@ -5,39 +5,27 @@ import com.back.nbe9112team06.global.entity.BaseEntity
 import jakarta.persistence.*
 
 @Entity
-class Member() : BaseEntity() {
-
+class Member @JvmOverloads constructor(
     @Column(nullable = false, unique = true)
-    var email: String? = null
-        protected set
-
+    var email: String,
     @Column(name = "password_hash", nullable = false)
-    var passwordHash: String? = null
-        protected set
-
+    var passwordHash: String,
     @Column(nullable = false)
-    var nickname: String? = null
-        protected set
-
+    var nickname: String,
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var timezone: TimezoneType? = null
-        protected set
-
+    var timezone: TimezoneType,
     @OneToMany(mappedBy = "member", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
     var meetings: MutableList<Meeting> = mutableListOf()
-        protected set
+) : BaseEntity() {
 
-    constructor(email: String, passwordHash: String, nickname: String, timezone: TimezoneType) : this() {
-        this.email = email
-        this.passwordHash = passwordHash
-        this.nickname = nickname
-        this.timezone = timezone
-    }
-
-    constructor(id: Int, nickname: String) : this() {
+    constructor(id: Int, nickname: String) : this(
+        email = "",
+        passwordHash = "",
+        nickname = nickname,
+        timezone = TimezoneType.ASIA_SEOUL
+    ) {
         this.id = id
-        this.nickname = nickname
     }
 
     fun getName() = nickname

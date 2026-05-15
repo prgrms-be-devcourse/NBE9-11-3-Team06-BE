@@ -41,27 +41,27 @@ class MeetingService(
         )
 
         for (date in request.dates) {
-            val meetingsDate = MeetingsDate(date, member.email!!)
+            val meetingsDate = MeetingsDate(date, member.email)
             meeting.addMeetingsDate(meetingsDate)
         }
 
         val saved = meetingRepository.save(meeting)
-        return MeetingCreateResponse(saved.id, saved.randomUrl!!)
+        return MeetingCreateResponse(saved.id, saved.randomUrl)
     }
 
     @Transactional(readOnly = true)
     fun getMeetingByRandomUrl(randomUrl: String): MeetingEntryResponse {
         val meeting = findMeetingByRandomUrlInternal(randomUrl)
 
-        val dates = meeting.meetingsDates.map { it.date!! }.sorted()
+        val dates = meeting.meetingsDates.map { it.date }.sorted()
 
         return MeetingEntryResponse(
             meeting.id,
-            meeting.title!!,
-            meeting.category!!,
-            meeting.duration!!,
-            meeting.status!!,
-            meeting.randomUrl!!,
+            meeting.title,
+            meeting.category,
+            meeting.duration,
+            meeting.status,
+            meeting.randomUrl,
             dates,
             meeting.createdAt,
             meeting.confirmedDate,
@@ -106,7 +106,7 @@ class MeetingService(
 
         meeting.confirm(request.date, request.time)
         return ConfirmedScheduleResponse.from(
-            request.date, request.time, MeetingStatus.CONFIRMED, meeting.title!!, meeting.duration!!
+            request.date, request.time, MeetingStatus.CONFIRMED, meeting.title, meeting.duration
         )
     }
 
@@ -136,24 +136,25 @@ class MeetingService(
         return ConfirmedScheduleResponse.from(
             meeting.confirmedDate!!,
             meeting.confirmedTime!!,
-            meeting.status!!,
-            meeting.title!!,
-            meeting.duration!!
+            meeting.status,
+            meeting.title,
+            meeting.duration
         )
     }
+
     // ── 목록 조회 ──────────────────────────────
     @Transactional(readOnly = true)
     fun getMyMeetings(memberId: Int): List<MeetingEntryResponse> {
         return meetingRepository.findByMember_IdOrderByCreatedAtDesc(memberId)
             .map { meeting ->
-                val dates = meeting.meetingsDates.map { it.date!! }.sorted()
+                val dates = meeting.meetingsDates.map { it.date }.sorted()
                 MeetingEntryResponse(
                     meeting.id,
-                    meeting.title!!,
-                    meeting.category!!,
-                    meeting.duration!!,
-                    meeting.status!!,
-                    meeting.randomUrl!!,
+                    meeting.title,
+                    meeting.category,
+                    meeting.duration,
+                    meeting.status,
+                    meeting.randomUrl,
                     dates,
                     meeting.createdAt,
                     meeting.confirmedDate,

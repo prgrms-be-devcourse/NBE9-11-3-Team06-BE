@@ -10,65 +10,55 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Entity
-class Meeting() : BaseEntity() {
-
-    var title: String? = null
-        protected set
-
-    var category: String? = null
-        protected set
-
-    @Column(name = "local_time")
-    var localTime: String? = null
-        protected set
-
-    @Enumerated(EnumType.STRING)
-    var status: MeetingStatus? = null
-        protected set
-
-    @Column(name = "random_url")
-    var randomUrl: String? = null
-        protected set
-
-    var duration: Int? = null
-        protected set
+class Meeting @JvmOverloads constructor(
+    var title: String,
+    var category: String,
+    var duration: Int,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    var member: Member? = null
-        protected set
+    var member: Member,
 
-    var confirmedDate: LocalDate? = null
-        protected set
+    @Column(name = "random_url")
+    var randomUrl: String,
 
-    var confirmedTime: LocalTime? = null
-        protected set
+    @Enumerated(EnumType.STRING)
+    var status: MeetingStatus = MeetingStatus.PENDING,
+
+    // 타임존 구현 시 필요
+//    @Column(name = "local_time")
+//    var localTime: String? = null,
+
+    var confirmedDate: LocalDate? = null,
+    var confirmedTime: LocalTime? = null,
 
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
-    val participants: MutableList<Participant> = mutableListOf()
+    val participants: MutableList<Participant> = mutableListOf(),
 
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
-    val meetingsDates: MutableList<MeetingsDate> = mutableListOf()
+    val meetingsDates: MutableList<MeetingsDate> = mutableListOf(),
 
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
-    val timeBlocks: MutableList<TimeBlock> = mutableListOf()
+    val timeBlocks: MutableList<TimeBlock> = mutableListOf(),
 
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
     val timeTables: MutableList<TimeTable> = mutableListOf()
 
+) : BaseEntity() {
+
     fun confirm(date: LocalDate, time: LocalTime) {
-        this.confirmedDate = date
-        this.confirmedTime = time
-        this.status = MeetingStatus.CONFIRMED
+        confirmedDate = date
+        confirmedTime = time
+        status = MeetingStatus.CONFIRMED
     }
 
     fun cancelConfirm() {
-        this.confirmedDate = null
-        this.confirmedTime = null
-        this.status = MeetingStatus.PENDING
+        confirmedDate = null
+        confirmedTime = null
+        status = MeetingStatus.PENDING
     }
 
-    fun isHost(memberId: Int): Boolean = member?.id == memberId
+    fun isHost(memberId: Int): Boolean = member.id == memberId
 
     fun addMeetingsDate(meetingsDate: MeetingsDate) {
         meetingsDates.add(meetingsDate)
@@ -78,14 +68,5 @@ class Meeting() : BaseEntity() {
     fun addParticipant(participant: Participant) {
         participants.add(participant)
         participant.assignMeeting(this)
-    }
-
-    constructor(title: String, category: String, duration: Int, member: Member, randomUrl: String) : this() {
-        this.title = title
-        this.category = category
-        this.duration = duration
-        this.member = member
-        this.randomUrl = randomUrl
-        this.status = MeetingStatus.PENDING
     }
 }

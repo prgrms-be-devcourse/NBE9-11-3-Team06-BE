@@ -5,31 +5,22 @@ import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
-class MeetingsDate() : BaseEntity() {
+class MeetingsDate(
+    var date: LocalDate,
+
+    @Column(name = "created_by")
+    var createdBy: String,
+
+    @Column(name = "modified_by")
+    var modifiedBy: String = createdBy,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id")
     var meeting: Meeting? = null
-        protected set
 
-    var date: LocalDate? = null
-        protected set
-
-    @Column(name = "created_by")
-    var createdBy: String? = null
-        protected set
-
-    @Column(name = "modified_by")
-    var modifiedBy: String? = null
-        protected set
+) : BaseEntity() {
 
     fun assignMeeting(meeting: Meeting) {
         this.meeting = meeting
-    }
-
-    constructor(date: LocalDate, createdBy: String) : this() {
-        this.date = date
-        this.createdBy = createdBy
-        this.modifiedBy = createdBy
     }
 }
