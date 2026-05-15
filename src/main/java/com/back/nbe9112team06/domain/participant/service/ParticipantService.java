@@ -47,7 +47,7 @@ public class ParticipantService {
 
     @Transactional
     public void deleteParticipant(Participant participant) {
-        if (participant.getId() == null || !participantRepository.existsById(participant.getId())) {
+        if (participant.getId() == 0 || !participantRepository.existsById(participant.getId())) {
             throw new BusinessException(ErrorCode.PARTICIPANT_NOT_FOUND);
         }
         participantRepository.delete(participant);
