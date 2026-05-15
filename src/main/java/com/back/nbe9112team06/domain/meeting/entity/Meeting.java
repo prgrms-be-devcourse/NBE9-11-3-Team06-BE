@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -65,7 +66,7 @@ public class Meeting extends BaseEntity {
     }
 
     public boolean isHost(Integer memberId){
-        return this.member != null && this.member.getId().equals(memberId);
+        return this.member != null && Objects.equals(this.member.getId(), memberId);
     }
 
     public static Meeting create(String title, String category, Integer duration, Member member, String randomUrl) {

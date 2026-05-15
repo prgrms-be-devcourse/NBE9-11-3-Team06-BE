@@ -1,0 +1,28 @@
+name: "📚 Docs"
+description: "문서 작업 이슈 템플릿"
+title: "[Docs] "
+labels: ["docs"]
+assignees:
+  - your-github-username
+body:
+  - type: input
+    attributes:
+      label: 📂 이슈 분류 (Group)
+      description: 문서 작업이 필요한 영역이나 모듈을 입력해주세요.
+      placeholder: 예) API 명세, README, 아키텍처 문서 등
+  - type: textarea
+    attributes:
+      label: 🔍 상세 설명 (Detail)
+      description: 문서 작업이 필요한 이유나 현재 문제점을 작성해주세요.
+      placeholder: 예) API 명세 누락, 설치 가이드 최신화 필요 등
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 작업 항목 (Todo)
+      description: 수행해야 할 작업들을 체크박스로 작성해주세요.
+      placeholder: |
+        - [ ] 문서화 대상 파악
+        - [ ] 초안 작성
+        - [ ] 검토 및 수정
+        - [ ] 최종 반영

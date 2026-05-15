@@ -1,0 +1,34 @@
+name: "⚡ Performance"
+description: "성능 개선 이슈 템플릿"
+title: "[Performance] "
+labels: ["performance"]
+assignees:
+  - your-github-username
+body:
+  - type: input
+    attributes:
+      label: 📂 이슈 분류 (Group)
+      description: 성능 개선이 필요한 코드 영역이나 모듈을 입력해주세요.
+      placeholder: 예) 검색 쿼리, 이미지 처리 등
+  - type: textarea
+    attributes:
+      label: 🔍 상세 설명 (Detail)
+      description: 성능 문제 증상, 측정 수치, 개선 목표 등을 작성해주세요.
+      placeholder: |
+        **현재 성능:**
+        
+        **목표 성능:**
+        
+        **발생 상황:**
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 작업 항목 (Todo)
+      description: 수행해야 할 작업들을 체크박스로 작성해주세요.
+      placeholder: |
+        - [ ] 병목 지점 분석
+        - [ ] 개선 방안 도출
+        - [ ] 코드 최적화
+        - [ ] 성능 측정 및 검증
+        - [ ] 영향 범위 검토
