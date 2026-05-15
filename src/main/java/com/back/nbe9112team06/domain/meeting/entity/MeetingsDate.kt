@@ -5,32 +5,31 @@ import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
-class MeetingsDate : BaseEntity() {
+class MeetingsDate() : BaseEntity() {
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id")
     var meeting: Meeting? = null
+        protected set
 
     var date: LocalDate? = null
+        protected set
 
     @Column(name = "created_by")
     var createdBy: String? = null
+        protected set
 
     @Column(name = "modified_by")
     var modifiedBy: String? = null
+        protected set
 
     fun assignMeeting(meeting: Meeting) {
         this.meeting = meeting
     }
 
-    companion object {
-        // TODO: Phase 2에서 주 생성자로 대체
-        @JvmStatic
-        fun create(date: LocalDate, createdBy: String): MeetingsDate {
-            val meetingsDate = MeetingsDate()
-            meetingsDate.date = date
-            meetingsDate.createdBy = createdBy
-            meetingsDate.modifiedBy = createdBy
-            return meetingsDate
-        }
+    constructor(date: LocalDate, createdBy: String) : this() {
+        this.date = date
+        this.createdBy = createdBy
+        this.modifiedBy = createdBy
     }
 }

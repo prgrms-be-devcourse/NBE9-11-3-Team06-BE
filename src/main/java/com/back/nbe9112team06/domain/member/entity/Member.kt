@@ -8,20 +8,25 @@ import jakarta.persistence.*
 class Member() : BaseEntity() {
 
     @Column(nullable = false, unique = true)
-    lateinit var email: String
+    var email: String? = null
+        protected set
 
     @Column(name = "password_hash", nullable = false)
-    lateinit var passwordHash: String
+    var passwordHash: String? = null
+        protected set
 
     @Column(nullable = false)
-    lateinit var nickname: String
+    var nickname: String? = null
+        protected set
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    lateinit var timezone: TimezoneType
+    var timezone: TimezoneType? = null
+        protected set
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
     var meetings: MutableList<Meeting> = mutableListOf()
+        protected set
 
     constructor(email: String, passwordHash: String, nickname: String, timezone: TimezoneType) : this() {
         this.email = email

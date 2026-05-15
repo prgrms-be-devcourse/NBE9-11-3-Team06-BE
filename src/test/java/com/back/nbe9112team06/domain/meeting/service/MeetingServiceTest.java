@@ -203,7 +203,7 @@ class MeetingServiceTest {
         Member host = new Member("host@test.com", "hash", "host", TimezoneType.ASIA_SEOUL);
         ReflectionTestUtils.setField(host, "id", HOST_MEMBER_ID);
 
-        Meeting hostMeeting = Meeting.create("내 모임", "STUDY", 60, host, "url1");
+        Meeting hostMeeting = new Meeting("내 모임", "STUDY", 60, host, "url1");
         ReflectionTestUtils.setField(hostMeeting, "id", MEETING_ID);
         ReflectionTestUtils.setField(hostMeeting, "createdAt", LocalDateTime.of(2026, 4, 20, 12, 0)); // Auditing 미동작으로 직접 주입
 

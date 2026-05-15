@@ -32,7 +32,7 @@ class MeetingService(
             .orElseThrow { BusinessException(ErrorCode.MEMBER_NOT_FOUND) }
 
         val randomUrl = generateUniqueUrl()
-        val meeting = Meeting.create(
+        val meeting = Meeting(
             request.title,
             request.category,
             request.duration,
@@ -41,7 +41,7 @@ class MeetingService(
         )
 
         for (date in request.dates) {
-            val meetingsDate = MeetingsDate.create(date, member.email)
+            val meetingsDate = MeetingsDate(date, member.email!!)
             meeting.addMeetingsDate(meetingsDate)
         }
 
@@ -53,11 +53,7 @@ class MeetingService(
     fun getMeetingByRandomUrl(randomUrl: String): MeetingEntryResponse {
         val meeting = findMeetingByRandomUrlInternal(randomUrl)
 
-        val dates: List<LocalDate> = meeting.meetingsDates
-            .stream()
-            .map { it.date!! }
-            .sorted()
-            .toList()
+        val dates = meeting.meetingsDates.map { it.date!! }.sorted()
 
         return MeetingEntryResponse(
             meeting.id,
@@ -149,13 +145,8 @@ class MeetingService(
     @Transactional(readOnly = true)
     fun getMyMeetings(memberId: Int): List<MeetingEntryResponse> {
         return meetingRepository.findByMember_IdOrderByCreatedAtDesc(memberId)
-            .stream()
             .map { meeting ->
-                val dates: List<LocalDate> = meeting.meetingsDates
-                    .stream()
-                    .map { it.date!! }
-                    .sorted()
-                    .toList()
+                val dates = meeting.meetingsDates.map { it.date!! }.sorted()
                 MeetingEntryResponse(
                     meeting.id,
                     meeting.title!!,
@@ -169,7 +160,6 @@ class MeetingService(
                     meeting.confirmedTime
                 )
             }
-            .toList()
     }
 
     // 외부 유틸

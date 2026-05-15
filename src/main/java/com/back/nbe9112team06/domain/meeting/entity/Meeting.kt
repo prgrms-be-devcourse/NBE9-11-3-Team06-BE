@@ -10,28 +10,39 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Entity
-// TODO: Phase 2 - 주 생성자(primary constructor) 방식으로 재구성, var → val/private set, nullable 제거
-class Meeting : BaseEntity() {
+class Meeting() : BaseEntity() {
+
     var title: String? = null
+        protected set
+
     var category: String? = null
+        protected set
 
     @Column(name = "local_time")
     var localTime: String? = null
+        protected set
 
     @Enumerated(EnumType.STRING)
     var status: MeetingStatus? = null
+        protected set
 
     @Column(name = "random_url")
     var randomUrl: String? = null
+        protected set
 
     var duration: Int? = null
+        protected set
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     var member: Member? = null
+        protected set
 
     var confirmedDate: LocalDate? = null
+        protected set
+
     var confirmedTime: LocalTime? = null
+        protected set
 
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
     val participants: MutableList<Participant> = mutableListOf()
@@ -57,9 +68,7 @@ class Meeting : BaseEntity() {
         this.status = MeetingStatus.PENDING
     }
 
-    fun isHost(memberId: Int): Boolean {
-        return this.member?.id == memberId
-    }
+    fun isHost(memberId: Int): Boolean = member?.id == memberId
 
     fun addMeetingsDate(meetingsDate: MeetingsDate) {
         meetingsDates.add(meetingsDate)
@@ -71,18 +80,12 @@ class Meeting : BaseEntity() {
         participant.assignMeeting(this)
     }
 
-    companion object {
-        // TODO: Phase 2에서 create() 자체를 없애고 주 생성자로 대체
-        @JvmStatic
-        fun create(title: String, category: String, duration: Int, member: Member, randomUrl: String): Meeting {
-            val meeting = Meeting()
-            meeting.title = title
-            meeting.category = category
-            meeting.duration = duration
-            meeting.member = member
-            meeting.randomUrl = randomUrl
-            meeting.status = MeetingStatus.PENDING
-            return meeting
-        }
+    constructor(title: String, category: String, duration: Int, member: Member, randomUrl: String) : this() {
+        this.title = title
+        this.category = category
+        this.duration = duration
+        this.member = member
+        this.randomUrl = randomUrl
+        this.status = MeetingStatus.PENDING
     }
 }
