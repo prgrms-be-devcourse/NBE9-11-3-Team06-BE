@@ -48,7 +48,7 @@ dependencies {
     implementation("tools.jackson.module:jackson-module-kotlin")
 
     annotationProcessor("org.projectlombok:lombok")
-    // TODO: Member, BaseEntity가 Kotlin으로 마이그레이션되면 Lombok 관련 항목(compileOnly, annotationProcessor, kapt) 모두 제거
+    // TODO: Member가 Kotlin으로 마이그레이션되면 Lombok 관련 항목(compileOnly, annotationProcessor, kapt) 모두 제거
     kapt("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")

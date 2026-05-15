@@ -58,6 +58,7 @@ class MeetingServiceTest {
         ReflectionTestUtils.setField(meeting, "title", "테스트 모임");
         ReflectionTestUtils.setField(meeting, "duration", 60);
         ReflectionTestUtils.setField(meeting, "participants", new ArrayList<>());
+
         return meeting;
     }
     private Meeting buildMeetingWithParticipants(MeetingStatus status, int participantCount) {

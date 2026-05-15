@@ -72,7 +72,7 @@ class Meeting : BaseEntity() {
     }
 
     companion object {
-        // TODO: hase 2에서 create() 자체를 없애고 주 생성자로 대체
+        // TODO: Phase 2에서 create() 자체를 없애고 주 생성자로 대체
         @JvmStatic
         fun create(title: String, category: String, duration: Int, member: Member, randomUrl: String): Meeting {
             val meeting = Meeting()
