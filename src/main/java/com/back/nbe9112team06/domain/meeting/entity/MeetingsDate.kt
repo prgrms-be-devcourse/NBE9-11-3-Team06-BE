@@ -23,6 +23,7 @@ class MeetingsDate : BaseEntity() {
     }
 
     companion object {
+        // TODO: Phase 2에서 주 생성자로 대체
         @JvmStatic
         fun create(date: LocalDate, createdBy: String): MeetingsDate {
             val meetingsDate = MeetingsDate()

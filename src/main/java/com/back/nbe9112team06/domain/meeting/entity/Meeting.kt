@@ -10,6 +10,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Entity
+// TODO: Phase 2 - 주 생성자(primary constructor) 방식으로 재구성, var → val/private set, nullable 제거
 class Meeting : BaseEntity() {
     var title: String? = null
     var category: String? = null
@@ -57,7 +58,7 @@ class Meeting : BaseEntity() {
     }
 
     fun isHost(memberId: Int): Boolean {
-        return this.member?.getId() == memberId
+        return this.member?.id == memberId
     }
 
     fun addMeetingsDate(meetingsDate: MeetingsDate) {
@@ -71,6 +72,7 @@ class Meeting : BaseEntity() {
     }
 
     companion object {
+        // TODO: hase 2에서 create() 자체를 없애고 주 생성자로 대체
         @JvmStatic
         fun create(title: String, category: String, duration: Int, member: Member, randomUrl: String): Meeting {
             val meeting = Meeting()

@@ -27,6 +27,7 @@ class MeetingService(
     // ── 모임 생성 ──────────────────────────────
     @Transactional
     fun createMeeting(memberId: Int, request: MeetingCreateRequest): MeetingCreateResponse {
+        // TODO: Phase 2 - MemberService.findById()를 Optional 대신 Kotlin nullable 반환으로 변경하고 orElseThrow 제거
         val member = memberService.findById(memberId)
             .orElseThrow { BusinessException(ErrorCode.MEMBER_NOT_FOUND) }
 
@@ -40,12 +41,12 @@ class MeetingService(
         )
 
         for (date in request.dates) {
-            val meetingsDate = MeetingsDate.create(date, member.getEmail())
+            val meetingsDate = MeetingsDate.create(date, member.email)
             meeting.addMeetingsDate(meetingsDate)
         }
 
         val saved = meetingRepository.save(meeting)
-        return MeetingCreateResponse(saved.getId(), saved.randomUrl!!)
+        return MeetingCreateResponse(saved.id, saved.randomUrl!!)
     }
 
     @Transactional(readOnly = true)
@@ -59,14 +60,14 @@ class MeetingService(
             .toList()
 
         return MeetingEntryResponse(
-            meeting.getId(),
+            meeting.id,
             meeting.title!!,
             meeting.category!!,
             meeting.duration!!,
             meeting.status!!,
             meeting.randomUrl!!,
             dates,
-            meeting.getCreatedAt(),
+            meeting.createdAt,
             meeting.confirmedDate,
             meeting.confirmedTime
         )
@@ -144,7 +145,6 @@ class MeetingService(
             meeting.duration!!
         )
     }
-
     // ── 목록 조회 ──────────────────────────────
     @Transactional(readOnly = true)
     fun getMyMeetings(memberId: Int): List<MeetingEntryResponse> {
@@ -157,14 +157,14 @@ class MeetingService(
                     .sorted()
                     .toList()
                 MeetingEntryResponse(
-                    meeting.getId(),
+                    meeting.id,
                     meeting.title!!,
                     meeting.category!!,
                     meeting.duration!!,
                     meeting.status!!,
                     meeting.randomUrl!!,
                     dates,
-                    meeting.getCreatedAt(),
+                    meeting.createdAt,
                     meeting.confirmedDate,
                     meeting.confirmedTime
                 )

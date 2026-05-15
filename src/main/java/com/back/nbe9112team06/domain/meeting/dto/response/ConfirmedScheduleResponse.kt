@@ -14,6 +14,7 @@ data class ConfirmedScheduleResponse(
     companion object {
         private val TIME_FMT: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
+        // TODO: 모든 호출부가 Kotlin이므로 @JvmStatic 제거 가능
         @JvmStatic
         fun from(
             date: LocalDate,

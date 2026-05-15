@@ -8,6 +8,7 @@ import com.back.nbe9112team06.domain.meeting.entity.MeetingStatus;
 import com.back.nbe9112team06.domain.meeting.repository.MeetingRepository;
 import com.back.nbe9112team06.domain.member.entity.Member;
 import com.back.nbe9112team06.domain.member.entity.TimezoneType;
+import com.back.nbe9112team06.domain.member.service.MemberService;
 import com.back.nbe9112team06.domain.participant.entity.Participant;
 import com.back.nbe9112team06.global.error.ErrorCode;
 import com.back.nbe9112team06.global.exception.BusinessException;
@@ -20,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,9 @@ class MeetingServiceTest {
 
     @Mock
     private MeetingRepository meetingRepository;
+
+    @Mock
+    private MemberService memberService;
 
     @InjectMocks
     private MeetingService meetingService;
@@ -197,11 +202,9 @@ class MeetingServiceTest {
         Member host = new Member("host@test.com", "hash", "host", TimezoneType.ASIA_SEOUL);
         ReflectionTestUtils.setField(host, "id", HOST_MEMBER_ID);
 
-        Member other = new Member("other@test.com", "hash", "other", TimezoneType.ASIA_SEOUL);
-        ReflectionTestUtils.setField(other, "id", OTHER_MEMBER_ID);
-
         Meeting hostMeeting = Meeting.create("내 모임", "STUDY", 60, host, "url1");
-        Meeting otherMeeting = Meeting.create("다른 사람 모임", "STUDY", 60, other, "url2");
+        ReflectionTestUtils.setField(hostMeeting, "id", MEETING_ID);
+        ReflectionTestUtils.setField(hostMeeting, "createdAt", LocalDateTime.of(2026, 4, 20, 12, 0)); // Auditing 미동작으로 직접 주입
 
         given(meetingRepository.findByMember_IdOrderByCreatedAtDesc(HOST_MEMBER_ID))
                 .willReturn(List.of(hostMeeting));
@@ -209,8 +212,7 @@ class MeetingServiceTest {
         List<MeetingEntryResponse> result = meetingService.getMyMeetings(HOST_MEMBER_ID);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).title).isEqualTo("내 모임");
-        assertThat(result.get(0).title).isNotEqualTo("다른 사람 모임");
+        assertThat(result.get(0).getTitle()).isEqualTo("내 모임");
     }
 
     @Test
