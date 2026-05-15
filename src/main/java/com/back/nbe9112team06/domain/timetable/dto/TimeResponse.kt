@@ -2,7 +2,7 @@ package com.back.nbe9112team06.domain.timetable.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalTime
-
+@JvmRecord
 @Schema(description = "시간 슬롯별 참여자 정보")
 data class TimeResponse(
     @field:Schema(

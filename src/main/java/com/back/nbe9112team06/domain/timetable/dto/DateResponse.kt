@@ -2,7 +2,7 @@ package com.back.nbe9112team06.domain.timetable.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
-
+@JvmRecord
 @Schema(description = "날짜별 가능 시간 정보")
 data class DateResponse(
     @field:Schema(

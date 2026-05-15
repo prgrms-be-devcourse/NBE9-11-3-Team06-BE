@@ -3,7 +3,7 @@ package com.back.nbe9112team06.domain.timetable.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
 import java.time.LocalTime
-
+@JvmRecord
 @Schema(description = "추천 일정 응답 데이터")
 data class RecommendedScheduleResponse(
     @field:Schema(
