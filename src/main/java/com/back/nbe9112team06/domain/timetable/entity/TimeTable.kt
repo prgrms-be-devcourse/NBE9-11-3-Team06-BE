@@ -16,7 +16,7 @@ class TimeTable() : BaseEntity() {
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     )
-     var dateInfos: MutableList<DateInfo> = ArrayList()
+     var dateInfos: MutableList<DateInfo> = mutableListOf()
 
     constructor(
         meeting: Meeting,

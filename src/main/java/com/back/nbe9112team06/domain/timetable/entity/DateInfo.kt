@@ -14,5 +14,5 @@ class DateInfo(
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "dateInfo", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val timeInfos: MutableList<TimeInfo> = ArrayList<TimeInfo>()
+    val timeInfos: MutableList<TimeInfo> = mutableListOf()
 }

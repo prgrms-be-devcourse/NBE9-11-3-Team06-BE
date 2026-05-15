@@ -9,14 +9,9 @@ data class DateResponse(
         description = "가능 날짜 (yyyy-MM-dd)",
         example = "2024-05-20"
     )
-    @param:Schema(
-        description = "가능 날짜 (yyyy-MM-dd)",
-        example = "2024-05-20"
-    )
     val availableDate: LocalDate,
 
     @field:Schema(description = "해당 날짜의 시간 슬롯별 정보 목록")
-    @param:Schema(description = "해당 날짜의 시간 슬롯별 정보 목록")
     val availableTimeInfos: List<TimeResponse>
 
 )
