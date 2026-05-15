@@ -85,10 +85,10 @@ class MeetingServiceTest {
 
         ConfirmedScheduleResponse response = meetingService.confirm(MEETING_ID, HOST_MEMBER_ID, request);
 
-        assertThat(response.status).isEqualTo(MeetingStatus.CONFIRMED);
-        assertThat(response.date).isEqualTo(LocalDate.of(2026, 4, 20));
-        assertThat(response.time).isEqualTo(LocalTime.of(14, 0));
-        assertThat(response.message).contains("2026-04-20", "14:00");
+        assertThat(response.getStatus()).isEqualTo(MeetingStatus.CONFIRMED);
+        assertThat(response.getDate()).isEqualTo(LocalDate.of(2026, 4, 20));
+        assertThat(response.getTime()).isEqualTo(LocalTime.of(14, 0));
+        assertThat(response.getMessage()).contains("2026-04-20", "14:00");
         assertThat(meeting.getStatus()).isEqualTo(MeetingStatus.CONFIRMED);
     }
 

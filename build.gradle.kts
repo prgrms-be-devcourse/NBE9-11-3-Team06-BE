@@ -2,8 +2,6 @@ plugins {
     java
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
-    // TODO: 전체 마이그레이션 완료 후 Lombok 의존성과 함께 제거
-    kotlin("kapt") version "2.2.21"
     id("org.springframework.boot") version "4.0.6"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.2.21"
@@ -48,8 +46,6 @@ dependencies {
     implementation("tools.jackson.module:jackson-module-kotlin")
 
     annotationProcessor("org.projectlombok:lombok")
-    // TODO: Member가 Kotlin으로 마이그레이션되면 Lombok 관련 항목(compileOnly, annotationProcessor, kapt) 모두 제거
-    kapt("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
