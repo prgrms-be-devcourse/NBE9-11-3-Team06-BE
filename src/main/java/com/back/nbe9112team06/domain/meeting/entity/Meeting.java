@@ -65,7 +65,7 @@ public class Meeting extends BaseEntity {
     }
 
     public boolean isHost(Integer memberId){
-        return this.member != null && this.member.getId().equals(memberId);
+        return this.member != null && this.member.getId() == memberId;
     }
 
     public static Meeting create(String title, String category, Integer duration, Member member, String randomUrl) {
