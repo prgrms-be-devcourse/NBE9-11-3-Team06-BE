@@ -1,8 +1,6 @@
 package com.back.nbe9112team06.domain.timeblock.service
 
-import com.back.nbe9112team06.domain.meeting.entity.Meeting
 import com.back.nbe9112team06.domain.meeting.service.MeetingService
-import com.back.nbe9112team06.domain.participant.entity.Participant
 import com.back.nbe9112team06.domain.participant.service.ParticipantService
 import com.back.nbe9112team06.domain.timeblock.dto.TimeBlockRequest
 import com.back.nbe9112team06.domain.timeblock.dto.TimeRangeResponse
@@ -73,7 +71,7 @@ class TimeBlockService(
         }
     }
 
-    //타임블록 삭제
+    // 타임블록 삭제
     @Transactional
     fun deleteTImeBlock(meetingId: Int, request: TimeBlockDeleteRequest) {
         // Meeting 존재 여부 확인
@@ -101,15 +99,11 @@ class TimeBlockService(
         val timeBlocks = timeBlockRepository.findWithAll(meetingId)
 
         return timeBlocks.map { timeBlock ->
-            val name = timeBlock.participant?.guestName
-                ?: throw BusinessException(ErrorCode.NOT_FOUND, "참여자 정보를 찾을 수 없습니다.")
+            val name = timeBlock.participant.guestName
 
             // 날짜별로 시간 슬롯 모으기 (날짜 정렬 보장 위해 TreeMap)
             val dateToSlots = timeBlock.availableDateTimes
-                .flatMap { adt ->
-                    val date = adt.date ?: return@flatMap emptyList<Pair<LocalDate, LocalTime>>()
-                    adt.availableTimes.mapNotNull { at -> at.time?.let { date to it } }
-                }
+                .flatMap { adt -> adt.availableTimes.map { adt.date to it.time } }
                 .groupBy({ it.first }, { it.second })
                 .toSortedMap()
 

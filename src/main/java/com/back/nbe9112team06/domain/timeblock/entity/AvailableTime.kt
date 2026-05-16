@@ -10,29 +10,26 @@ import jakarta.persistence.ManyToOne
 import java.time.LocalTime
 
 @Entity
-class AvailableTime : BaseEntity() {
+class AvailableTime(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "available_date_time_id")
-    var availableDateTime: AvailableDateTime? = null
-        protected set
+    var availableDateTime: AvailableDateTime,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "time_block_id")
-    var timeBlock: TimeBlock? = null
-        protected set
+    var timeBlock: TimeBlock,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_id")
-    var meeting: Meeting? = null
-        protected set
+    var meeting: Meeting,
 
-    var time: LocalTime? = null
-        protected set
+    var time: LocalTime,
 
     @Column(name = "created_by")
-    var createdBy: String? = null
-        protected set
+    var createdBy: String,
+
+    ) : BaseEntity() {
 
     companion object {
         @JvmStatic
@@ -41,12 +38,12 @@ class AvailableTime : BaseEntity() {
             timeBlock: TimeBlock,
             meeting: Meeting,
             time: LocalTime,
-        ): AvailableTime = AvailableTime().apply {
-            this.availableDateTime = availableDateTime
-            this.timeBlock = timeBlock
-            this.meeting = meeting
-            this.time = time
-            this.createdBy = timeBlock.participant?.guestName
-        }
+        ): AvailableTime = AvailableTime(
+            availableDateTime = availableDateTime,
+            timeBlock = timeBlock,
+            meeting = meeting,
+            time = time,
+            createdBy = timeBlock.participant.guestName,
+        )
     }
 }
