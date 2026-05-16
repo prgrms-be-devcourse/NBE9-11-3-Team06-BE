@@ -9,6 +9,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -48,7 +49,7 @@ class TimeTableServiceTestJava {
                 .containsExactlyInAnyOrder("철수", "영희");
 
         // 10:00 → 철수
-        assertThat(times.get(1).time()).isEqualTo("10:00:00");
+        assertThat(times.get(1).time()).isEqualTo("09:30:00");
         assertThat(times.get(1).participants())
                 .containsExactly("철수");
 
@@ -109,10 +110,81 @@ class TimeTableServiceTestJava {
     void 타임블럭없으면_aggregate_시_예외발생() {
 
         // 타임블럭 없는 meetingId
-        Integer meetingId = 10;
+        Integer meetingId = 4;
 
         assertThatThrownBy(() -> timeTableService.aggregate(meetingId))
-                .isInstanceOf(BusinessException.class);
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("타임블럭이 존재하지 않습니다");
     }
 
+    @Test
+    void aggregate_여러번호출해도_중복생성되지않음() {
+
+        // when
+        timeTableService.aggregate(1);
+        timeTableService.aggregate(1);
+
+        TimeTableResponse result = timeTableService.getTimeTable(1);
+
+        // then
+        assertThat(result.availableDateTimes()).hasSize(1);
+
+        var date = result.availableDateTimes().get(0);
+        var times = date.availableTimeInfos();
+
+        // 기존과 동일하게 유지되어야 함
+        assertThat(times).hasSize(3);
+
+        // 09:00 → 철수, 영희 중복 없어야 함
+        assertThat(times.get(0).participants())
+                .containsExactlyInAnyOrder("철수", "영희");
+
+        // participant 수 중복 없어야 함
+        assertThat(times.get(0).participants()).hasSize(2);
+    }
+
+    @Test
+    void 존재하지않는_모임_getTimeTable_조회시_예외발생() {
+
+        assertThatThrownBy(() -> timeTableService.getTimeTable(666))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("존재하지 않는 모임입니다");
+    }
+
+    @Test
+    void recommend_추천일정_정상조회() {
+
+        // given
+        timeTableService.aggregate(1);
+
+        // when
+        var result = timeTableService.recommend(1);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        var first = result.get(0);
+
+        assertThat(first.availableCount()).isGreaterThan(0);
+        assertThat(first.startTime()).isBefore(first.endTime());
+    }
+
+    @Test
+    void recommend_참여자많은순_정렬검증() {
+
+        // given
+        timeTableService.aggregate(1);
+
+        // when
+        var result = timeTableService.recommend(1);
+
+        // then
+        for (int i = 0; i < result.size() - 1; i++) {
+
+            assertThat(result.get(i).availableCount())
+                    .isGreaterThanOrEqualTo(
+                            result.get(i + 1).availableCount()
+                    );
+        }
+    }
 }

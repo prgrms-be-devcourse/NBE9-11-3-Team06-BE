@@ -19,6 +19,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
+ * TODO
  * 현재 타 도메인의 JpaRepository 메서드를 그대로 사용 중
  * merge 이후 각 Service의 메서드로 수정 필요
  * meeting 생성시 빈 timetable 생성되도록 하기
@@ -121,20 +122,20 @@ class TimeTableService(
         val timeBlocks = timeBlockRepository.findWithAll(meetingId)
 
         if (timeBlocks.isEmpty()) {
-            throw BusinessException(ErrorCode.NOT_FOUND)
+            throw BusinessException(ErrorCode.TIMEBLOCK_NOT_FOUND)
         }
 
         return timeBlocks
     }
 
     // 미팅 ID로 TimeTable 반환
-    @Transactional
+    @Transactional(readOnly = true)
     fun getTimeTable(meetingId: Int): TimeTableResponse {
 
         val tables = timeTableRepository.findByMeeting_Id(meetingId)
 
         if (tables.isEmpty()) {
-            return TimeTableResponse(emptyList())
+            throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
         }
 
         val table = tables[0]
@@ -153,7 +154,7 @@ class TimeTableService(
                 timeResponses.add(
                     TimeResponse(
                         timeInfo.time,
-                        participants as List<String>,
+                        participants,
                         participants.size
                     )
                 )
@@ -239,7 +240,7 @@ class TimeTableService(
             .take(5)
     }
 
-    private fun groupConsecutiveSlots(
+    fun groupConsecutiveSlots(
         slots: List<TimeInfo>
     ): List<List<TimeInfo>> {
 

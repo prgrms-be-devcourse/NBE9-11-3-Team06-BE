@@ -12,7 +12,8 @@ INSERT INTO meeting (id, title, status, category, duration, local_time, random_u
 VALUES 
 (1, '회의1', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url1', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (2, '회의2', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url2', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(3, '회의3', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url3', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+(3, '회의3', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url3', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, '회의4', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url4', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO time_table (id, meeting_id)
 VALUES (1, 1);
@@ -22,6 +23,9 @@ VALUES (2, 2);
 
 INSERT INTO time_table (id, meeting_id)
 VALUES (3, 3);
+
+INSERT INTO time_table (id, meeting_id)
+VALUES (4, 4);
 -- =========================
 -- 2️⃣ PARTICIPANT
 -- =========================
@@ -68,7 +72,7 @@ INSERT INTO available_time (id, time, available_date_time_id, meeting_id, time_b
 VALUES 
 -- meeting1
 (1, '09:00', 1, 1, 1, '철수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(2, '10:00', 1, 1, 1, '철수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, '09:30', 1, 1, 1, '철수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (3, '09:00', 2, 1, 2, '영희', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (4, '11:00', 3, 1, 3, '민수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 

@@ -158,7 +158,7 @@ public enum ErrorCode {
     TIMEBLOCK_NOT_FOUND(
             HttpStatus.NOT_FOUND,
             "TIMEBLOCK-001",
-            "존재하지 않는 타임블럭입니다."
+            "타임블럭이 존재하지 않습니다."
     );
 
     private final HttpStatus status;

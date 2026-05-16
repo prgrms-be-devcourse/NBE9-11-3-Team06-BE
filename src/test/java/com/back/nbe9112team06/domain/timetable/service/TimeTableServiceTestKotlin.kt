@@ -47,7 +47,7 @@ internal class TimeTableServiceTestKotlin {
             .containsExactlyInAnyOrder("철수", "영희")
 
         // 10:00 → 철수
-        Assertions.assertThat(times[1].time).isEqualTo("10:00:00")
+        Assertions.assertThat(times[1].time).isEqualTo("09:30:00")
         Assertions.assertThat(times[1].participants)
             .containsExactly("철수")
 
