@@ -23,7 +23,7 @@ public class ParticipantService {
     public ParticipantJoinResponse joinMeeting(String randomUrl, ParticipantJoinRequest request) {
         Meeting meeting = meetingService.getMeetingByRandomUrlOrThrow(randomUrl);
 
-        Participant participant = Participant.create(request.guestName(), request.guestPassword());
+        Participant participant = Participant.create(request.guestName, request.guestPassword);
         meeting.addParticipant(participant);
 
         Participant saved = participantRepository.save(participant);

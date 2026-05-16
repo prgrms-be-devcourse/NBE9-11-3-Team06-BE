@@ -68,8 +68,8 @@ class ParticipantServiceTest {
         ParticipantJoinResponse response =
                 participantService.joinMeeting(url, new ParticipantJoinRequest("홍길동", "1234"));
 
-        assertThat(response.participantId()).isEqualTo(99);
-        assertThat(response.guestName()).isEqualTo("홍길동");
+        assertThat(response.participantId).isEqualTo(99);
+        assertThat(response.guestName).isEqualTo("홍길동");
     }
 
     @Test
