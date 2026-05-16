@@ -59,6 +59,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlin {
