@@ -1,10 +1,8 @@
-package com.back.nbe9112team06.global.springDoc.example;
+package com.back.nbe9112team06.global.springDoc.example
 
-public class AuthApiExamples {
-
+object AuthApiExamples {
     // ── POST /api/auth/login ──────────────────────────────
-
-    public static final String LOGIN_SUCCESS_JSON = """
+    const val LOGIN_SUCCESS_JSON: String = """
             {
               "code": "201-1",
               "message": "로그인 성공",
@@ -12,11 +10,10 @@ public class AuthApiExamples {
                 "nickname": "gildong"
               }
             }
-            """;
+            """
 
     // ── GET /api/auth/me ──────────────────────────────
-
-    public static final String GET_MY_INFO_SUCCESS_JSON = """
+    const val GET_MY_INFO_SUCCESS_JSON: String = """
             {
               "code": "200-1",
               "message": "조회 성공",
@@ -24,15 +21,14 @@ public class AuthApiExamples {
                 "nickname": "gildong"
               }
             }
-            """;
+            """
 
     // ── POST /api/auth/logout ──────────────────────────────
-
-    public static final String LOGOUT_SUCCESS_JSON = """
+    const val LOGOUT_SUCCESS_JSON: String = """
             {
               "code": "200-1",
               "message": "로그아웃 성공",
               "data": null
             }
-            """;
+            """
 }
