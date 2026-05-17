@@ -12,6 +12,7 @@ import com.back.nbe9112team06.domain.meeting.repository.MeetingRepository
 import com.back.nbe9112team06.domain.member.service.MemberService
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.security.SecureRandom
@@ -40,9 +41,8 @@ class MeetingService(
             randomUrl
         )
 
-        for (date in request.dates) {
-            val meetingsDate = MeetingsDate(date, member.email)
-            meeting.addMeetingsDate(meetingsDate)
+        request.dates.forEach { date ->
+            meeting.addMeetingsDate(MeetingsDate(date, member.email))
         }
 
         val saved = meetingRepository.save(meeting)
@@ -165,16 +165,12 @@ class MeetingService(
 
     // 외부 유틸
     @Transactional(readOnly = true)
-    fun getMeetingOrThrow(meetingId: Int): Meeting {
-        return meetingRepository.findById(meetingId)
-            .orElseThrow { BusinessException(ErrorCode.MEETING_NOT_FOUND) }
-    }
+    fun getMeetingOrThrow(meetingId: Int): Meeting =
+        meetingRepository.findByIdOrNull(meetingId) ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
     @Transactional(readOnly = true)
-    fun getMeetingByRandomUrlOrThrow(randomUrl: String): Meeting {
-        return meetingRepository.findByRandomUrl(randomUrl)
-            .orElseThrow { BusinessException(ErrorCode.MEETING_NOT_FOUND) }
-    }
+    fun getMeetingByRandomUrlOrThrow(randomUrl: String): Meeting =
+        meetingRepository.findByRandomUrl(randomUrl) ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
     // ── 내부 유틸 ──────────────────────────────
     private fun generateUniqueUrl(): String {
@@ -194,15 +190,11 @@ class MeetingService(
         return builder.toString()
     }
 
-    private fun findMeetingInternal(meetingId: Int): Meeting {
-        return meetingRepository.findById(meetingId)
-            .orElseThrow { BusinessException(ErrorCode.MEETING_NOT_FOUND) }
-    }
+    private fun findMeetingInternal(meetingId: Int): Meeting =
+        meetingRepository.findByIdOrNull(meetingId) ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
-    private fun findMeetingByRandomUrlInternal(randomUrl: String): Meeting {
-        return meetingRepository.findByRandomUrl(randomUrl)
-            .orElseThrow { BusinessException(ErrorCode.MEETING_NOT_FOUND) }
-    }
+    private fun findMeetingByRandomUrlInternal(randomUrl: String): Meeting =
+        meetingRepository.findByRandomUrl(randomUrl) ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
     companion object {
         private const val URL_CHAR_POOL = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

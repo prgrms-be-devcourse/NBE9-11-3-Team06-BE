@@ -142,7 +142,7 @@ class MeetingServiceTest {
             ReflectionTestUtils.setField(meeting, "category", "STUDY");
             ReflectionTestUtils.setField(meeting, "randomUrl", "testUrl123");
             ReflectionTestUtils.setField(meeting, "createdAt", LocalDateTime.of(2026, 4, 20, 12, 0));
-            given(meetingRepository.findByRandomUrl("testUrl123")).willReturn(Optional.of(meeting));
+            given(meetingRepository.findByRandomUrl("testUrl123")).willReturn(meeting);
 
             MeetingEntryResponse response = meetingService.getMeetingByRandomUrl("testUrl123");
 
@@ -154,7 +154,7 @@ class MeetingServiceTest {
         @Test
         @DisplayName("실패 - 존재하지 않는 URL이면 예외 발생")
         void getMeetingByRandomUrl_notFound_throwsException() {
-            given(meetingRepository.findByRandomUrl("notExists")).willReturn(Optional.empty());
+            given(meetingRepository.findByRandomUrl("notExists")).willReturn(null);
 
             assertThatThrownBy(() -> meetingService.getMeetingByRandomUrl("notExists"))
                     .isInstanceOf(BusinessException.class)

@@ -21,11 +21,9 @@ data class ConfirmedScheduleResponse(
             title: String,
             duration: Int
         ): ConfirmedScheduleResponse {
-            val endTime = time.plusMinutes(duration.toLong()).format(TIME_FMT)
-            val message = String.format(
-                "📅 %s 일정이 확정되었습니다!\n\n• 날짜: %s\n• 시간: %s ~ %s",
-                title, date, time.format(TIME_FMT), endTime
-            )
+            val startFmt = time.format(TIME_FMT)
+            val endFmt = time.plusMinutes(duration.toLong()).format(TIME_FMT)
+            val message = "📅 $title 일정이 확정되었습니다!\n\n• 날짜: $date\n• 시간: $startFmt ~ $endFmt"
             return ConfirmedScheduleResponse(date, time, message, status)
         }
     }

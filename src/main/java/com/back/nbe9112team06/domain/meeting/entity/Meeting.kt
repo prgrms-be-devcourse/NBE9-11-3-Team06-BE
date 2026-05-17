@@ -10,6 +10,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Entity
+// TODO: Phase 2 - 테스트 코드 Kotlin 변환 완료 후 @JvmOverloads 제거
 class Meeting @JvmOverloads constructor(
     var title: String,
     var category: String,
