@@ -1,3 +1,5 @@
+import org.gradle.internal.impldep.org.eclipse.jgit.diff.DiffDriver.java
+
 plugins {
     java
     kotlin("jvm") version "2.2.21"
@@ -5,6 +7,7 @@ plugins {
     id("org.springframework.boot") version "4.0.6"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.2.21"
+    kotlin("plugin.lombok") version "2.2.21"
 }
 
 group = "com.back"
@@ -53,6 +56,8 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlin {

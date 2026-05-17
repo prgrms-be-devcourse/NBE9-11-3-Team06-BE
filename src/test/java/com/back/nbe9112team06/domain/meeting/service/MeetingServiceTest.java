@@ -1,8 +1,8 @@
 package com.back.nbe9112team06.domain.meeting.service;
 
-import com.back.nbe9112team06.domain.meeting.dto.request.MeetingCreateRequest;
 import com.back.nbe9112team06.domain.meeting.dto.response.ConfirmedScheduleResponse;
 import com.back.nbe9112team06.domain.meeting.dto.request.FinalizeRequest;
+import com.back.nbe9112team06.domain.meeting.dto.request.MeetingCreateRequest;
 import com.back.nbe9112team06.domain.meeting.dto.response.MeetingCreateResponse;
 import com.back.nbe9112team06.domain.meeting.dto.response.MeetingEntryResponse;
 import com.back.nbe9112team06.domain.meeting.entity.Meeting;
