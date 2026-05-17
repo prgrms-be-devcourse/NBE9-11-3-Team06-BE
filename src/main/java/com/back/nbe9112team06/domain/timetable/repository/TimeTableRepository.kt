@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query
 import java.util.*
 
 interface TimeTableRepository : JpaRepository<TimeTable, Int> {
-    fun findByMeeting_Id(meetingId: Int): MutableList<TimeTable>
+    fun findByMeetingId(meetingId: Int): MutableList<TimeTable>
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(
@@ -16,8 +16,7 @@ interface TimeTableRepository : JpaRepository<TimeTable, Int> {
     select tt
     from TimeTable tt
     where tt.meeting.id = :meetingId
-
-"""
+    """
     )
     fun findByMeetingIdForUpdate(meetingId: Int): Optional<TimeTable>
 }

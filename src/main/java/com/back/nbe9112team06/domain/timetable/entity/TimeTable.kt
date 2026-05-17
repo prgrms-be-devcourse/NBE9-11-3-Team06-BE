@@ -3,6 +3,7 @@ package com.back.nbe9112team06.domain.timetable.entity
 import com.back.nbe9112team06.domain.meeting.entity.Meeting
 import com.back.nbe9112team06.global.entity.BaseEntity
 import jakarta.persistence.*
+import org.hibernate.annotations.BatchSize
 
 @Entity
 class TimeTable() : BaseEntity() {
@@ -16,6 +17,7 @@ class TimeTable() : BaseEntity() {
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     )
+    @BatchSize(size = 100)
      var dateInfos: MutableList<DateInfo> = mutableListOf()
 
     constructor(

@@ -14,9 +14,8 @@ interface TimeBlockRepository : JpaRepository<TimeBlock, Int> {
     // meetingId 로 모든 TimeBlock + 연관관계 fetch join 으로 한 번에 로드
     @Query(
         """
-        select distinct tb from TimeBlock tb
-        join fetch tb.participant p
-        join fetch tb.availableDateTimes d
+        select tb
+        from TimeBlock tb
         where tb.meeting.id = :meetingId
         """
     )

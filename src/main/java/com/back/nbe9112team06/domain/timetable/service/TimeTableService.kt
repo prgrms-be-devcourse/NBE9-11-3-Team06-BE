@@ -100,7 +100,7 @@ class TimeTableService(
 
     // meetingId로 TimeTable 검색
     fun findByMeetingId(meetingId: Int): List<TimeTable> {
-        return timeTableRepository.findByMeeting_Id(meetingId)
+        return timeTableRepository.findByMeetingId(meetingId)
     }
 
     // timetable 저장
@@ -112,7 +112,7 @@ class TimeTableService(
     @Transactional
     fun deleteAllByMeetingId(meetingId: Int) {
 
-        val tables = timeTableRepository.findByMeeting_Id(meetingId)
+        val tables = timeTableRepository.findByMeetingId(meetingId)
 
         timeTableRepository.deleteAll(tables)
     }
@@ -126,7 +126,7 @@ class TimeTableService(
     @Transactional(readOnly = true)
     fun getTimeTable(meetingId: Int): TimeTableResponse {
 
-        val tables = timeTableRepository.findByMeeting_Id(meetingId)
+        val tables = timeTableRepository.findByMeetingId(meetingId)
 
         if (tables.isEmpty()) {
             throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
@@ -172,7 +172,7 @@ class TimeTableService(
     @Transactional
     fun recommend(meetingId: Int): List<RecommendedScheduleResponse> {
 
-        val tables = timeTableRepository.findByMeeting_Id(meetingId)
+        val tables = timeTableRepository.findByMeetingId(meetingId)
 
         if (tables.isEmpty()) {
             return emptyList()
