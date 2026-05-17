@@ -68,8 +68,9 @@ class ParticipantServiceTest {
         ParticipantJoinResponse response =
                 participantService.joinMeeting(url, new ParticipantJoinRequest("홍길동", "1234"));
 
-        assertThat(response.participantId).isEqualTo(99);
-        assertThat(response.guestName).isEqualTo("홍길동");
+        // TODO: 테스트 Kotlin 마이그레이션 시 getter 방식으로 변경
+        assertThat(response.getParticipantId()).isEqualTo(99);
+        assertThat(response.getGuestName()).isEqualTo("홍길동");
     }
 
     @Test
