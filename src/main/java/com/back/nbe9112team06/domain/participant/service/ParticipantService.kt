@@ -21,7 +21,7 @@ class ParticipantService(
     fun joinMeeting(randomUrl: String, request: ParticipantJoinRequest): ParticipantJoinResponse {
         val meeting = meetingService.getMeetingByRandomUrlOrThrow(randomUrl)
 
-        val participant = Participant.create(request.guestName!!, request.guestPassword!!)
+        val participant = Participant.create(request.guestName, request.guestPassword)
         meeting.addParticipant(participant)
 
         val saved = participantRepository.save(participant)
@@ -29,10 +29,9 @@ class ParticipantService(
     }
 
     @Transactional(readOnly = true)
-    fun findParticipantOrThrow(meeting: Meeting, guestName: String, guestPassword: String): Participant {
-        return participantRepository.findByMeetingAndGuestNameAndGuestPassword(meeting, guestName, guestPassword)
-            .orElseThrow { BusinessException(ErrorCode.PARTICIPANT_NOT_FOUND) }
-    }
+    fun findParticipantOrThrow(meeting: Meeting, guestName: String, guestPassword: String): Participant =
+        participantRepository.findByMeetingAndGuestNameAndGuestPassword(meeting, guestName, guestPassword)
+            ?: throw BusinessException(ErrorCode.PARTICIPANT_NOT_FOUND)
 
     @Transactional(readOnly = true)
     fun findParticipantByRandomUrlOrThrow(randomUrl: String, guestName: String, guestPassword: String): Participant {

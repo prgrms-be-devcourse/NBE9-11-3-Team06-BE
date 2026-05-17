@@ -22,6 +22,7 @@ class Participant(
     }
 
     companion object {
+        // TODO: Phase 2 - 테스트 코드 Kotlin 변환 완료 후 @JvmStatic 제거
         @JvmStatic
         fun create(guestName: String, guestPassword: String): Participant {
             return Participant(guestName, guestPassword)

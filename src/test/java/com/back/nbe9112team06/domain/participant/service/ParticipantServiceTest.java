@@ -18,8 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -98,7 +96,7 @@ class ParticipantServiceTest {
         Participant expected = savedParticipant("홍길동", "1234", 5);
 
         given(participantRepository.findByMeetingAndGuestNameAndGuestPassword(meeting, "홍길동", "1234"))
-                .willReturn(Optional.of(expected));
+                .willReturn(expected);
 
         Participant result = participantService.findParticipantOrThrow(meeting, "홍길동", "1234");
 
@@ -111,7 +109,7 @@ class ParticipantServiceTest {
         Meeting meeting = buildMeeting("url1");
 
         given(participantRepository.findByMeetingAndGuestNameAndGuestPassword(meeting, "홍길동", "wrong"))
-                .willReturn(Optional.empty());
+                .willReturn(null);
 
         assertThatThrownBy(() ->
                 participantService.findParticipantOrThrow(meeting, "홍길동", "wrong"))
@@ -131,7 +129,7 @@ class ParticipantServiceTest {
 
         given(meetingService.getMeetingByRandomUrlOrThrow(url)).willReturn(meeting);
         given(participantRepository.findByMeetingAndGuestNameAndGuestPassword(meeting, "홍길동", "1234"))
-                .willReturn(Optional.of(expected));
+                .willReturn(expected);
 
         Participant result = participantService.findParticipantByRandomUrlOrThrow(url, "홍길동", "1234");
 
@@ -160,7 +158,7 @@ class ParticipantServiceTest {
 
         given(meetingService.getMeetingByRandomUrlOrThrow(url)).willReturn(meeting);
         given(participantRepository.findByMeetingAndGuestNameAndGuestPassword(meeting, "없는사람", "0000"))
-                .willReturn(Optional.empty());
+                .willReturn(null);
 
         assertThatThrownBy(() ->
                 participantService.findParticipantByRandomUrlOrThrow(url, "없는사람", "0000"))
