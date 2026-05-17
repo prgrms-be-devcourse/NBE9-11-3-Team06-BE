@@ -1,4 +1,4 @@
-package com.back.nbe9112team06.domain.timetable.controller
+package com.back.nbe9112team06.domain.timetable.Lock
 
 import com.back.nbe9112team06.domain.timetable.service.TimeTableService
 import org.junit.jupiter.api.Test

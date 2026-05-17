@@ -52,7 +52,6 @@ class TimeTableController(private val timeTableService: TimeTableService) {
         )]
     )
     fun getTimeTable(@PathVariable meetingId: Int): ApiResponse<TimeTableResponse> {
-        timeTableService.aggregate(meetingId)
         return ApiResponse<TimeTableResponse>("200-1", "타임테이블 조회 성공", timeTableService.getTimeTable(meetingId))
     }
 

@@ -12,15 +12,19 @@ import com.back.nbe9112team06.domain.timeblock.entity.TimeBlock
 import com.back.nbe9112team06.domain.timeblock.repository.AvailableDateTimeRepository
 import com.back.nbe9112team06.domain.timeblock.repository.AvailableTimeRepository
 import com.back.nbe9112team06.domain.timeblock.repository.TimeBlockRepository
+import com.back.nbe9112team06.domain.timetable.service.TimeTableService
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
+import io.mockk.Runs
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.just
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -50,8 +54,17 @@ class TimeBlockServiceTest {
     @MockK
     private lateinit var availableTimeRepository: AvailableTimeRepository
 
+    @MockK
+    private lateinit var timeTableService: TimeTableService
+
     @InjectMockKs
     private lateinit var service: TimeBlockService
+
+    @BeforeEach
+    fun setUp() {
+        every { timeTableService.aggregate(any()) } just Runs
+    }
+
 
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 

@@ -46,6 +46,7 @@ class TimeTableService(
 
         for (timeBlock in timeBlocks) {
 
+
             val participantName = timeBlock.participant.guestName
 
             for (availableDateTime in timeBlock.availableDateTimes) {
@@ -118,14 +119,7 @@ class TimeTableService(
 
     // 타임블록 DB 에서 데이터 꺼내기
     fun findWithAll(meetingId: Int): List<TimeBlock> {
-
-        val timeBlocks = timeBlockRepository.findWithAll(meetingId)
-
-        if (timeBlocks.isEmpty()) {
-            throw BusinessException(ErrorCode.TIMEBLOCK_NOT_FOUND)
-        }
-
-        return timeBlocks
+        return timeBlockRepository.findWithAll(meetingId)
     }
 
     // 미팅 ID로 TimeTable 반환
