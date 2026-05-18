@@ -18,12 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-/**
- * TODO
- * 현재 타 도메인의 JpaRepository 메서드를 그대로 사용 중
- * merge 이후 각 Service의 메서드로 수정 필요
- * meeting 생성시 빈 timetable 생성되도록 하기
- */
+// TODO meeting 생성시 빈 timetable 생성되도록 하기
 @Service
 class TimeTableService(
     private val timeTableRepository: TimeTableRepository,
@@ -35,7 +30,7 @@ class TimeTableService(
     fun aggregate(meetingId: Int) {
 
         val timeTable = timeTableRepository.findByMeetingIdForUpdate(meetingId)
-            .orElseThrow { BusinessException(ErrorCode.MEETING_NOT_FOUND) }
+            ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
         timeTable.dateInfos.clear()
 

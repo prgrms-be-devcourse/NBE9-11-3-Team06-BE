@@ -5,7 +5,6 @@ import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
-import java.util.*
 
 interface TimeTableRepository : JpaRepository<TimeTable, Int> {
     fun findByMeetingId(meetingId: Int): MutableList<TimeTable>
@@ -18,5 +17,5 @@ interface TimeTableRepository : JpaRepository<TimeTable, Int> {
     where tt.meeting.id = :meetingId
     """
     )
-    fun findByMeetingIdForUpdate(meetingId: Int): Optional<TimeTable>
+    fun findByMeetingIdForUpdate(meetingId: Int): TimeTable?
 }
