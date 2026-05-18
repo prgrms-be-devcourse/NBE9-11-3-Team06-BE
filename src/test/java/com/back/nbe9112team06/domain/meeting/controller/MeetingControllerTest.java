@@ -3,6 +3,7 @@ package com.back.nbe9112team06.domain.meeting.controller;
 import com.back.nbe9112team06.domain.member.entity.Member;
 import com.back.nbe9112team06.domain.member.entity.TimezoneType;
 import com.back.nbe9112team06.domain.member.repository.MemberRepository;
+import com.back.nbe9112team06.domain.timetable.service.TimeTableService;
 import com.back.nbe9112team06.testutil.AuthTokenHelper;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,6 +40,9 @@ class MeetingControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TimeTableService timeTableService;
 
     // ── 공통 헬퍼 ─────────────────────────────────────────────────────────────
 

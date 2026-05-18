@@ -12,6 +12,7 @@ import com.back.nbe9112team06.domain.member.entity.Member;
 import com.back.nbe9112team06.domain.member.entity.TimezoneType;
 import com.back.nbe9112team06.domain.member.service.MemberService;
 import com.back.nbe9112team06.domain.participant.entity.Participant;
+import com.back.nbe9112team06.domain.timetable.service.TimeTableService;
 import com.back.nbe9112team06.global.error.ErrorCode;
 import com.back.nbe9112team06.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +45,9 @@ class MeetingServiceTest {
 
     @Mock
     private MemberService memberService;
+
+    @Mock
+    private TimeTableService timeTableService;
 
     @InjectMocks
     private MeetingService meetingService;
