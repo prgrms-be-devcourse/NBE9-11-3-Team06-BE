@@ -2,12 +2,7 @@ package com.back.nbe9112team06.domain.member.entity
 
 import com.back.nbe9112team06.domain.meeting.entity.Meeting
 import com.back.nbe9112team06.global.entity.BaseEntity
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 
 @Entity
 class Member(
@@ -24,8 +19,7 @@ class Member(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var timezone: TimezoneType,
-
-    ) : BaseEntity() {
+) : BaseEntity() {
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
     val meetings: MutableList<Meeting> = mutableListOf()
