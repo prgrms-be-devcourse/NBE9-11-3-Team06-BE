@@ -19,13 +19,13 @@ VALUES
 -- =========================
 -- 1️⃣ MEETING
 -- =========================
-INSERT INTO meeting (id, title, status, category, duration, local_time, random_url, member_id, created_at, modified_at)
+INSERT INTO meeting (id, title, status, category, duration, random_url, member_id, created_at, modified_at)
 VALUES
-(1, '회의1', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url1', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(2, '회의2', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url2', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(3, '회의3', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url3', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(4, '회의4', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url4', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(5, '회의5', 'PENDING', 'GENERAL', 60, 'ASIA/SEOUL', 'url5', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+(1, '회의1', 'PENDING', 'GENERAL', 60, 'url1', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, '회의2', 'PENDING', 'GENERAL', 60, 'url2', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, '회의3', 'PENDING', 'GENERAL', 60, 'url3', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, '회의4', 'PENDING', 'GENERAL', 60, 'url4', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(5, '회의5', 'PENDING', 'GENERAL', 60, 'url5', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 INSERT INTO time_table (id, meeting_id)
