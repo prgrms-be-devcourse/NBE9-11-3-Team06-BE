@@ -21,11 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 
 @RestController
@@ -135,7 +131,7 @@ class MemberController(
         ],
     )
     fun deleteMember(): ApiResponse<Void> {
-        val actor = rq.actor
+        val actor = rq.getActor()
         memberService.deleteMember(actor.id)
         rq.clearAccessTokenCookie()
 

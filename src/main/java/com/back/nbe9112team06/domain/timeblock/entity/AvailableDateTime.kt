@@ -2,13 +2,7 @@ package com.back.nbe9112team06.domain.timeblock.entity
 
 import com.back.nbe9112team06.domain.meeting.entity.Meeting
 import com.back.nbe9112team06.global.entity.BaseEntity
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity

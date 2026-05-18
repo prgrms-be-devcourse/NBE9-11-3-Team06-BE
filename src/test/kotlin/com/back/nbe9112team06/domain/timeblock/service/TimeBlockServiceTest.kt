@@ -81,7 +81,7 @@ class TimeBlockServiceTest {
         val ex = throwable as BusinessException
 
         // 피드백 반영: status, code, message 일치 검증
-        assertThat(ex.errorCode).isEqualTo(expectedErrorCode.code)      // code 비교
+        assertThat(ex.errorCode.code).isEqualTo(expectedErrorCode.code)      // code 비교
         assertThat(ex.httpStatus).isEqualTo(expectedErrorCode.status)   // status 비교
 
         messageContains?.let {

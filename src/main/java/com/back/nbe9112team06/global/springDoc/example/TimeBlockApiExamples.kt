@@ -1,34 +1,33 @@
-package com.back.nbe9112team06.global.springDoc.example;
+package com.back.nbe9112team06.global.springDoc.example
 
-public class TimeBlockApiExamples {
-
+object TimeBlockApiExamples {
     // ── POST /api/meetings/{meetingId}/time-blocks ──────────────────────────────
-    public static final String ADD_TIMEBLOCK_SUCCESS_JSON = """
+    const val  ADD_TIMEBLOCK_SUCCESS_JSON: String = """
             {
               "code": "201-1",
               "message": "시간표가 등록되었습니다.",
               "data": null
-            }
-            """;
+            }           
+            """
 
-    public static final String ADD_TIMEBLOCK_VALIDATION_ERROR_JSON = """
+    const val  ADD_TIMEBLOCK_VALIDATION_ERROR_JSON: String = """
             {
               "errorCode": "TIMEBLOCK-001",
               "detail": "올바른 날짜 형식이 아닙니다. (yyyy-MM-dd HH:mm)"
-            }
-            """;
+            }           
+            """
 
     // ── DELETE /api/meetings/{meetingId}/time-blocks ──────────────────────────────
-    public static final String DELETE_TIMEBLOCK_SUCCESS_JSON = """
+    const val  DELETE_TIMEBLOCK_SUCCESS_JSON: String = """
             {
               "code": "204-1",
               "message": "시간표가 삭제되었습니다.",
               "data": null
-            }
-            """;
+            }           
+            """
 
     // ── GET /api/meetings/{meetingId}/participants ──────────────────────────────
-    public static final String GET_PARTICIPANT_SCHEDULES_SUCCESS_JSON = """
+    const val  GET_PARTICIPANT_SCHEDULES_SUCCESS_JSON: String = """
             {
               "code": "200-1",
               "message": "참여자 목록입니다.",
@@ -59,6 +58,6 @@ public class TimeBlockApiExamples {
                   ]
                 }
               ]
-            }
-            """;
+            }           
+            """
 }
