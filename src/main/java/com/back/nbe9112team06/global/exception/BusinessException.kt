@@ -6,11 +6,11 @@ import org.springframework.http.ProblemDetail
 /***
  *  getErrorCode()가 val 자동생성된 getErrorCode()과
  *  errorCode에 있는 Code을 가져오는 getErrorCode()와 2가지가 있었어 문제 발생
- *  private로 공개 getter 차단
+ *  private로 공개 getter 차단 => test코드에서 접근 불가로 internal val로 수정
 ***/
 
 class BusinessException(
-    private val errorCode: ErrorCode,
+    internal val errorCode: ErrorCode,
     customMessage: String?
 ) : RuntimeException(customMessage) {
     constructor(errorCode: ErrorCode): this(errorCode, null)

@@ -6,16 +6,20 @@ import jakarta.persistence.*
 
 @Entity
 class Member(
+
     @Column(nullable = false, unique = true)
     var email: String,
+
     @Column(name = "password_hash", nullable = false)
     var passwordHash: String,
+
     @Column(nullable = false)
     var nickname: String,
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var timezone: TimezoneType,
-    ) : BaseEntity() {
+) : BaseEntity() {
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
     val meetings: MutableList<Meeting> = mutableListOf()
