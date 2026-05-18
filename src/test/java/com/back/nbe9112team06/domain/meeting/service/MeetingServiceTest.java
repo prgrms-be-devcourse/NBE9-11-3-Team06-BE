@@ -7,6 +7,7 @@ import com.back.nbe9112team06.domain.meeting.dto.response.MeetingCreateResponse;
 import com.back.nbe9112team06.domain.meeting.dto.response.MeetingEntryResponse;
 import com.back.nbe9112team06.domain.meeting.entity.Meeting;
 import com.back.nbe9112team06.domain.meeting.entity.MeetingStatus;
+import com.back.nbe9112team06.domain.meeting.entity.MeetingsDate;
 import com.back.nbe9112team06.domain.meeting.repository.MeetingRepository;
 import com.back.nbe9112team06.domain.member.entity.Member;
 import com.back.nbe9112team06.domain.member.entity.TimezoneType;
@@ -153,6 +154,37 @@ class MeetingServiceTest {
             assertThat(response.getTitle()).isEqualTo("테스트 모임");
             assertThat(response.getStatus()).isEqualTo(MeetingStatus.PENDING);
             assertThat(response.getRoomUrl()).isEqualTo("testUrl123");
+        }
+
+        @Test
+        @DisplayName("성공 - 날짜 목록이 오름차순으로 정렬되어 반환된다")
+        void getMeetingByRandomUrl_datesSortedAscending() {
+            Meeting meeting = buildMeeting(MeetingStatus.PENDING);
+            ReflectionTestUtils.setField(meeting, "category", "STUDY");
+            ReflectionTestUtils.setField(meeting, "randomUrl", "sortUrl");
+            ReflectionTestUtils.setField(meeting, "createdAt", LocalDateTime.of(2026, 4, 20, 12, 0));
+
+            // 의도적으로 역순(비정렬)으로 날짜 삽입
+            MeetingsDate d1 = new MeetingsDate();
+            ReflectionTestUtils.setField(d1, "date", LocalDate.of(2026, 4, 22));
+            MeetingsDate d2 = new MeetingsDate();
+            ReflectionTestUtils.setField(d2, "date", LocalDate.of(2026, 4, 20));
+            MeetingsDate d3 = new MeetingsDate();
+            ReflectionTestUtils.setField(d3, "date", LocalDate.of(2026, 4, 21));
+
+            ReflectionTestUtils.setField(meeting, "meetingsDates",
+                    new ArrayList<>(List.of(d1, d2, d3)));
+
+            given(meetingRepository.findByRandomUrl("sortUrl")).willReturn(meeting);
+
+            MeetingEntryResponse response = meetingService.getMeetingByRandomUrl("sortUrl");
+
+            assertThat(response.getDates())
+                    .containsExactly(
+                            LocalDate.of(2026, 4, 20),
+                            LocalDate.of(2026, 4, 21),
+                            LocalDate.of(2026, 4, 22)
+                    );
         }
 
         @Test
