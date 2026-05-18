@@ -66,7 +66,7 @@ class TimeBlockServiceTest {
             .format(formatter)
 
     private fun newMeeting(id: Int): Meeting =
-        Meeting().also { ReflectionTestUtils.setField(it, "id", id) }
+        io.mockk.mockk<Meeting>(relaxed = true) { every { this@mockk.id } returns id }
 
     private fun newParticipant(id: Int, name: String, password: String): Participant =
         Participant.create(name, password).also { ReflectionTestUtils.setField(it, "id", id) }
