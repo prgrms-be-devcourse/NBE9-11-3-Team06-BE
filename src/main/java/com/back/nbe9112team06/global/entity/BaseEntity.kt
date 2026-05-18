@@ -9,7 +9,7 @@ import java.util.*
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseEntity{
+abstract class BaseEntity {
     //TODO 통합할시 주 생성자로 id을 넣고 다른 entity에서 base(0)으로 생성자를 넣는다.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
