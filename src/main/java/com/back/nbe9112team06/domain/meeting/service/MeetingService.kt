@@ -50,34 +50,14 @@ class MeetingService(
     }
 
     @Transactional(readOnly = true)
-    fun getMeetingByRandomUrl(randomUrl: String): MeetingEntryResponse {
-        val meeting = findMeetingByRandomUrlInternal(randomUrl)
-
-        val dates = meeting.meetingsDates.map { it.date }.sorted()
-
-        return MeetingEntryResponse(
-            meeting.id,
-            meeting.title,
-            meeting.category,
-            meeting.duration,
-            meeting.status,
-            meeting.randomUrl,
-            dates,
-            meeting.createdAt,
-            meeting.confirmedDate,
-            meeting.confirmedTime
-        )
-    }
+    fun getMeetingByRandomUrl(randomUrl: String): MeetingEntryResponse =
+        findMeetingByRandomUrlInternal(randomUrl).toEntryResponse()
 
     // ── 모임 삭제 ──────────────────────────────
     @Transactional
     fun deleteMeeting(meetingId: Int, memberId: Int) {
         val meeting = findMeetingInternal(meetingId)
-
-        if (!meeting.isHost(memberId)) {
-            throw BusinessException(ErrorCode.NOT_MEETING_HOST)
-        }
-
+        meeting.validateHost(memberId)
         meetingRepository.delete(meeting)
     }
 
@@ -91,10 +71,7 @@ class MeetingService(
     @Transactional
     fun confirm(meetingId: Int, memberId: Int, request: FinalizeRequest): ConfirmedScheduleResponse {
         val meeting = findMeetingInternal(meetingId)
-
-        if (!meeting.isHost(memberId)) {
-            throw BusinessException(ErrorCode.NOT_MEETING_HOST)
-        }
+        meeting.validateHost(memberId)
 
         if (meeting.participants.isEmpty()) {
             throw BusinessException(ErrorCode.MEETING_NO_PARTICIPANTS)
@@ -113,10 +90,7 @@ class MeetingService(
     @Transactional
     fun cancelConfirm(meetingId: Int, memberId: Int) {
         val meeting = findMeetingInternal(meetingId)
-
-        if (!meeting.isHost(memberId)) {
-            throw BusinessException(ErrorCode.NOT_MEETING_HOST)
-        }
+        meeting.validateHost(memberId)
 
         if (meeting.status != MeetingStatus.CONFIRMED) {
             throw BusinessException(ErrorCode.NOT_CONFIRMED)
@@ -144,24 +118,9 @@ class MeetingService(
 
     // ── 목록 조회 ──────────────────────────────
     @Transactional(readOnly = true)
-    fun getMyMeetings(memberId: Int): List<MeetingEntryResponse> {
-        return meetingRepository.findByMember_IdOrderByCreatedAtDesc(memberId)
-            .map { meeting ->
-                val dates = meeting.meetingsDates.map { it.date }.sorted()
-                MeetingEntryResponse(
-                    meeting.id,
-                    meeting.title,
-                    meeting.category,
-                    meeting.duration,
-                    meeting.status,
-                    meeting.randomUrl,
-                    dates,
-                    meeting.createdAt,
-                    meeting.confirmedDate,
-                    meeting.confirmedTime
-                )
-            }
-    }
+    fun getMyMeetings(memberId: Int): List<MeetingEntryResponse> =
+        meetingRepository.findByMember_IdOrderByCreatedAtDesc(memberId)
+            .map { it.toEntryResponse() }
 
     // 외부 유틸
     @Transactional(readOnly = true)
@@ -173,13 +132,29 @@ class MeetingService(
         meetingRepository.findByRandomUrl(randomUrl) ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
     // ── 내부 유틸 ──────────────────────────────
-    private fun generateUniqueUrl(): String {
-        var candidate = randomString(URL_LENGTH)
-        while (meetingRepository.existsByRandomUrl(candidate)) {
-            candidate = randomString(URL_LENGTH)
-        }
-        return candidate
+    private fun Meeting.validateHost(memberId: Int) {
+        if (!isHost(memberId)) throw BusinessException(ErrorCode.NOT_MEETING_HOST)
     }
+
+    private fun Meeting.toEntryResponse(): MeetingEntryResponse {
+        val dates = meetingsDates.map { it.date }.sorted()
+        return MeetingEntryResponse(
+            id,
+            title,
+            category,
+            duration,
+            status,
+            randomUrl,
+            dates,
+            createdAt,
+            confirmedDate,
+            confirmedTime
+        )
+    }
+
+    private fun generateUniqueUrl(): String =
+        generateSequence { randomString(URL_LENGTH) }
+            .first { !meetingRepository.existsByRandomUrl(it) }
 
     private fun randomString(length: Int): String {
         val builder = StringBuilder(length)
