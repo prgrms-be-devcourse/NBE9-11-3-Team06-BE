@@ -108,7 +108,7 @@ internal class TimeTableServiceTest {
         } as BusinessException
 
         assertThat(exception.errorCode)
-            .isEqualTo(ErrorCode.MEETING_NOT_FOUND.code)
+            .isEqualTo(ErrorCode.MEETING_NOT_FOUND)
 
         assertThat(exception.message)
             .contains("존재하지 않는 모임입니다")
@@ -161,7 +161,7 @@ internal class TimeTableServiceTest {
         } as BusinessException
 
         assertThat(exception.errorCode)
-            .isEqualTo(ErrorCode.MEETING_NOT_FOUND.code)
+            .isEqualTo(ErrorCode.MEETING_NOT_FOUND)
 
         assertThat(exception.message)
             .contains("존재하지 않는 모임입니다")
