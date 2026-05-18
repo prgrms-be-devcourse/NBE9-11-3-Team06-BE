@@ -17,11 +17,11 @@ abstract class BaseEntity {
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    var createdAt: LocalDateTime? = null
+    lateinit var createdAt: LocalDateTime
 
     @LastModifiedDate
     @Column(name = "modified_at")
-    var modifiedAt: LocalDateTime? = null
+    lateinit var modifiedAt: LocalDateTime
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true

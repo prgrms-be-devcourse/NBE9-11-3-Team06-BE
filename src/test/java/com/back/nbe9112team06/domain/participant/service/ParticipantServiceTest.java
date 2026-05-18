@@ -40,7 +40,7 @@ class ParticipantServiceTest {
     private Meeting buildMeeting(String randomUrl) {
         Member host = new Member("host@test.com", "hash", "호스트", TimezoneType.ASIA_SEOUL);
         ReflectionTestUtils.setField(host, "id", 1);
-        Meeting meeting = Meeting.create("테스트 모임", "STUDY", 60, host, randomUrl);
+        Meeting meeting = new Meeting("테스트 모임", "STUDY", 60, host, randomUrl);
         ReflectionTestUtils.setField(meeting, "id", 10);
         return meeting;
     }

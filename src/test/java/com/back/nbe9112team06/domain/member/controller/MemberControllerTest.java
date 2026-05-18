@@ -137,8 +137,9 @@ class MemberControllerTest {
                     .andExpect(jsonPath("$.validationErrors").isArray());
         }
 
+        //
         @Test
-        @DisplayName("t5: 필수 필드 누락 → 400, COMMON-009")
+        @DisplayName("t5: 필수 필드 누락 → 400, COMMON-002")
         void t5_signup_missingRequiredField() throws Exception {
             // email 만 포함한 불완전한 요청
             String body = jsonMapper.writeValueAsString(Map.of("email", "test@example.com"));
@@ -147,7 +148,7 @@ class MemberControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(body))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errorCode").value("COMMON-009"));
+                    .andExpect(jsonPath("$.errorCode").value("COMMON-002"));
         }
     }
 
@@ -195,7 +196,7 @@ class MemberControllerTest {
         }
 
         @Test
-        @DisplayName("t9: 이메일 필드 누락 → 400, COMMON-009")
+        @DisplayName("t9: 이메일 필드 누락 → 400, COMMON-002")
         void t9_checkEmail_missingEmail() throws Exception {
             String body = jsonMapper.writeValueAsString(Map.of());  // 빈 객체
 
@@ -203,7 +204,7 @@ class MemberControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(body))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errorCode").value("COMMON-009"));
+                    .andExpect(jsonPath("$.errorCode").value("COMMON-002"));
         }
     }
 
