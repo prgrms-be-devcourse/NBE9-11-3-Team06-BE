@@ -26,9 +26,9 @@ class Meeting @JvmOverloads constructor(
     @Enumerated(EnumType.STRING)
     var status: MeetingStatus = MeetingStatus.PENDING,
 
-    // 타임존 구현 시 필요
-//    @Column(name = "local_time")
-//    var localTime: String? = null,
+     //타임존 구현 시 필요
+    @Column(name = "local_time")
+    var localTime: String? = null,
 
     var confirmedDate: LocalDate? = null,
     var confirmedTime: LocalTime? = null,

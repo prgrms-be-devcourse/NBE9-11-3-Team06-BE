@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.*
 
 @DisplayName("MemberService 단위 테스트")
+
 class MemberServiceTest {
 
     private val memberRepository: MemberRepository = mockk()
@@ -47,7 +48,8 @@ class MemberServiceTest {
         assertThat(ex).isInstanceOf(BusinessException::class.java)
         val be = ex as BusinessException
         assertThat(be.httpStatus).isEqualTo(expected.status)
-        assertThat(be.errorCode).isEqualTo(expected.code)
+        // 객체와 code을 비교해서 에러발셍 -> 객체의 코드와 코드를 비교로 수정
+        assertThat(be.errorCode.code).isEqualTo(expected.code)
         assertThat(be.message).isEqualTo(expected.message)
     }
 

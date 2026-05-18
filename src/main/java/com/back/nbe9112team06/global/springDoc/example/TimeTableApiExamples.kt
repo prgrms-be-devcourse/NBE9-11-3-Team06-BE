@@ -1,9 +1,8 @@
-package com.back.nbe9112team06.global.springDoc.example;
+package com.back.nbe9112team06.global.springDoc.example
 
-public class TimeTableApiExamples {
-
+object TimeTableApiExamples {
     // ── GET /api/meetings/{meetingId}/timetable ──────────────────────────────
-    public static final String GET_TIMETABLE_SUCCESS_JSON = """
+    const val  GET_TIMETABLE_SUCCESS_JSON: String = """
             {
               "code": "200-1",
               "message": "타임테이블 조회 성공",
@@ -32,9 +31,10 @@ public class TimeTableApiExamples {
                 ]
               }
             }
-            """;
+            """
 
-    public static final String GET_TIMETABLE_EMPTY_JSON = """
+
+    const val  GET_TIMETABLE_EMPTY_JSON: String = """
             {
               "code": "200-1",
               "message": "타임테이블 조회 성공",
@@ -42,10 +42,10 @@ public class TimeTableApiExamples {
                 "availableDateTimes": []
               }
             }
-            """;
+            """
 
     // ── GET /api/meetings/{meetingId}/recommend ──────────────────────────────
-    public static final String GET_RECOMMEND_SUCCESS_JSON = """
+    const val  GET_RECOMMEND_SUCCESS_JSON: String = """
             {
               "code": "200-1",
               "message": "추천 일정입니다.",
@@ -64,5 +64,5 @@ public class TimeTableApiExamples {
                 }
               ]
             }
-            """;
+            """
 }
