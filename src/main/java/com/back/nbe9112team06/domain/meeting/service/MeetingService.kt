@@ -10,18 +10,20 @@ import com.back.nbe9112team06.domain.meeting.entity.MeetingStatus
 import com.back.nbe9112team06.domain.meeting.entity.MeetingsDate
 import com.back.nbe9112team06.domain.meeting.repository.MeetingRepository
 import com.back.nbe9112team06.domain.member.service.MemberService
+import com.back.nbe9112team06.domain.timetable.entity.TimeTable
+import com.back.nbe9112team06.domain.timetable.service.TimeTableService
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.security.SecureRandom
-import java.time.LocalDate
 
 @Service
 class MeetingService(
     private val meetingRepository: MeetingRepository,
-    private val memberService: MemberService
+    private val memberService: MemberService,
+    private val timeTableService: TimeTableService
 ) {
     private val secureRandom = SecureRandom()
 
@@ -46,6 +48,10 @@ class MeetingService(
         }
 
         val saved = meetingRepository.save(meeting)
+
+        val timeTable = TimeTable(meeting, mutableListOf())
+        timeTableService.save(timeTable)
+
         return MeetingCreateResponse(saved.id, saved.randomUrl)
     }
 

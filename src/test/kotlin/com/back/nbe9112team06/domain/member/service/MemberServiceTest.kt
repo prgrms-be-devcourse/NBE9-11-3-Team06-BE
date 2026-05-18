@@ -5,6 +5,7 @@ import com.back.nbe9112team06.domain.member.dto.request.CheckEmailRequest
 import com.back.nbe9112team06.domain.member.entity.Member
 import com.back.nbe9112team06.domain.member.entity.TimezoneType
 import com.back.nbe9112team06.domain.member.repository.MemberRepository
+import com.back.nbe9112team06.domain.timetable.service.TimeTableService
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
 import io.mockk.every
@@ -24,7 +25,7 @@ class MemberServiceTest {
 
     private val memberRepository: MemberRepository = mockk()
     private val passwordEncoder: PasswordEncoder = mockk()
-
+    private val timeTableService: TimeTableService = mockk()
     private val memberService = MemberService(memberRepository, passwordEncoder)
 
     private val testEmail = "user@example.com"

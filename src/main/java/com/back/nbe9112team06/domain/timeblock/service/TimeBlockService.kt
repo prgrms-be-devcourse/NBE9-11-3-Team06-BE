@@ -12,6 +12,7 @@ import com.back.nbe9112team06.domain.timeblock.entity.TimeBlock
 import com.back.nbe9112team06.domain.timeblock.repository.AvailableDateTimeRepository
 import com.back.nbe9112team06.domain.timeblock.repository.AvailableTimeRepository
 import com.back.nbe9112team06.domain.timeblock.repository.TimeBlockRepository
+import com.back.nbe9112team06.domain.timetable.service.TimeTableService
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
 import org.springframework.stereotype.Service
@@ -29,6 +30,7 @@ class TimeBlockService(
     private val timeBlockRepository: TimeBlockRepository,
     private val availableDateTimeRepository: AvailableDateTimeRepository,
     private val availableTimeRepository: AvailableTimeRepository,
+    private val timeTableService: TimeTableService
 ) {
 
     // 타임블록 등록
@@ -61,14 +63,22 @@ class TimeBlockService(
 
         // AvailableDateTime, AvailableTime 저장
         dateTimeMap.forEach { (date, times) ->
-            val availableDateTime = AvailableDateTime.create(timeBlock, meeting, date)
-                .also { availableDateTimeRepository.save(it) }
+
+            val availableDateTime =
+                AvailableDateTime.create(timeBlock, meeting, date)
+            timeBlock.availableDateTimes.add(availableDateTime)
+            availableDateTimeRepository.save(availableDateTime)
 
             times.forEach { time ->
-                AvailableTime.create(availableDateTime, timeBlock, meeting, time)
-                    .also { availableTimeRepository.save(it) }
+
+                val availableTime =
+                    AvailableTime.create(availableDateTime, timeBlock, meeting, time)
+                availableDateTime.availableTimes.add(availableTime)
+                availableTimeRepository.save(availableTime)
             }
         }
+        // 생성 후 aggregate
+        timeTableService.aggregate(meetingId)
     }
 
     // 타임블록 삭제
@@ -91,6 +101,9 @@ class TimeBlockService(
         // TimeBlock 먼저 삭제 (participant_id FK 제거), 이후 Participant 삭제
         timeBlockRepository.delete(timeBlock)
         participantService.deleteParticipant(participant)
+
+        // 삭제 후 aggregate
+        timeTableService.aggregate(meetingId)
     }
 
     // 참여자 목록

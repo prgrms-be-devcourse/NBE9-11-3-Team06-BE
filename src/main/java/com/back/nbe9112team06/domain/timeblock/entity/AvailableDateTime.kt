@@ -3,6 +3,7 @@ package com.back.nbe9112team06.domain.timeblock.entity
 import com.back.nbe9112team06.domain.meeting.entity.Meeting
 import com.back.nbe9112team06.global.entity.BaseEntity
 import jakarta.persistence.*
+import org.hibernate.annotations.BatchSize
 import java.time.LocalDate
 
 @Entity
@@ -24,6 +25,7 @@ class AvailableDateTime(
     ) : BaseEntity() {
 
     @OneToMany(mappedBy = "availableDateTime", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @BatchSize(size = 100)
     val availableTimes: MutableList<AvailableTime> = mutableListOf()
 
     companion object {
