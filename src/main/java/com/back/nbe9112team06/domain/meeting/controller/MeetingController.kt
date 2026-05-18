@@ -12,6 +12,15 @@ import com.back.nbe9112team06.global.rq.Rq
 import com.back.nbe9112team06.global.springDoc.annotation.AuthErrorResponses
 import com.back.nbe9112team06.global.springDoc.annotation.CommonErrorResponses
 import com.back.nbe9112team06.global.springDoc.annotation.MeetingErrorResponses
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CANCEL_CONFIRM_SUCCESS_JSON
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CHECK_CREATOR_IS_HOST_JSON
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CHECK_CREATOR_NOT_HOST_JSON
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CONFIRM_SCHEDULE_SUCCESS_JSON
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CREATE_MEETING_SUCCESS_JSON
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.DELETE_MEETING_SUCCESS_JSON
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.GET_CONFIRMED_SCHEDULE_SUCCESS_JSON
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.GET_MEETING_BY_URL_SUCCESS_JSON
+import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.GET_MY_MEETINGS_SUCCESS_JSON
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
@@ -21,16 +30,6 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.GET_MY_MEETINGS_SUCCESS_JSON
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CREATE_MEETING_SUCCESS_JSON
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.GET_MEETING_BY_URL_SUCCESS_JSON
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CHECK_CREATOR_IS_HOST_JSON
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CHECK_CREATOR_NOT_HOST_JSON
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.DELETE_MEETING_SUCCESS_JSON
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CONFIRM_SCHEDULE_SUCCESS_JSON
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.CANCEL_CONFIRM_SUCCESS_JSON
-import com.back.nbe9112team06.global.springDoc.example.MeetingApiExamples.GET_CONFIRMED_SCHEDULE_SUCCESS_JSON
 
 @RestController
 @RequestMapping("/api/meetings")
@@ -54,7 +53,7 @@ class MeetingController(
         )]
     )
     fun getMyMeetings(): ApiResponse<List<MeetingEntryResponse>> {
-        val memberId = rq.actor.id
+        val memberId = rq.getActor().id
         return ApiResponse("200-1", "모임 목록 조회 성공", meetingService.getMyMeetings(memberId))
     }
 
@@ -84,7 +83,7 @@ class MeetingController(
         )]
     )
     fun createMeeting(@RequestBody @Valid request: MeetingCreateRequest): ApiResponse<MeetingCreateResponse> {
-        val memberId = rq.actor.id
+        val memberId = rq.getActor().id
         val response = meetingService.createMeeting(memberId, request)
         return ApiResponse("201-1", "모임방 생성 성공", response)
     }
@@ -125,7 +124,7 @@ class MeetingController(
         )]
     )
     fun checkCreator(@PathVariable randomUrl: String): ApiResponse<HostCheckResponse> {
-        val memberId = rq.actor.id
+        val memberId = rq.getActor().id
         val isHost = meetingService.checkIsHost(randomUrl, memberId)
         return ApiResponse(
             "200-1",
@@ -150,7 +149,7 @@ class MeetingController(
         )]
     )
     fun deleteMeeting(@PathVariable meetingId: Int) {
-        val memberId = rq.actor.id
+        val memberId = rq.getActor().id
         meetingService.deleteMeeting(meetingId, memberId)
     }
 
@@ -181,7 +180,7 @@ class MeetingController(
         @PathVariable meetingId: Int,
         @Valid @RequestBody request: FinalizeRequest
     ): ApiResponse<ConfirmedScheduleResponse> {
-        val memberId = rq.actor.id
+        val memberId = rq.getActor().id
         return ApiResponse("200-1", "일정이 확정되었습니다.", meetingService.confirm(meetingId, memberId, request))
     }
 
@@ -200,7 +199,7 @@ class MeetingController(
         )]
     )
     fun cancelConfirm(@PathVariable meetingId: Int): ApiResponse<Void?> {
-        val memberId = rq.actor.id
+        val memberId = rq.getActor().id
         meetingService.cancelConfirm(meetingId, memberId)
         return ApiResponse("200-1", "일정 확정이 취소되었습니다.", null)
     }
