@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-// TODO meeting 생성시 빈 timetable 생성되도록 하기
 @Service
 class TimeTableService(
     private val timeTableRepository: TimeTableRepository,
@@ -75,17 +74,17 @@ class TimeTableService(
         for ((date, timeEntries) in dateMap) {
 
             val dateInfo = DateInfo(timeTable, date)
-            timeTable.dateInfos.add(dateInfo)
+                .also { timeTable.dateInfos.add(it) }
 
             for ((dateTime, participantNames) in timeEntries) {
 
                 val timeInfo = TimeInfo(dateInfo, dateTime.toLocalTime())
-                dateInfo.timeInfos.add(timeInfo)
+                    .also { dateInfo.timeInfos.add(it) }
 
                 for (participantName in participantNames) {
 
                     val adjustResult = AdjustResult(timeInfo, participantName)
-                    timeInfo.adjustResultList.add(adjustResult)
+                        .also {timeInfo.adjustResultList.add(it)}
                 }
             }
         }
