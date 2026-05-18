@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.org.eclipse.jgit.diff.DiffDriver.java
-
 plugins {
     java
     kotlin("jvm") version "2.2.21"
@@ -47,6 +45,9 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("tools.jackson.module:jackson-module-kotlin")
+
+    //kotlin logging
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
 
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
