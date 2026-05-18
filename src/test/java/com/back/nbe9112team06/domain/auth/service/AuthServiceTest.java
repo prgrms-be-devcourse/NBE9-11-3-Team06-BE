@@ -73,11 +73,11 @@ class AuthServiceTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.accessToken()).isNotBlank();
-            assertThat(result.memberId()).isEqualTo(savedMember.getId());
-            assertThat(result.nickname()).isEqualTo(TEST_NICKNAME);
+            assertThat(result.getAccessToken()).isNotBlank();
+            assertThat(result.getMemberId()).isEqualTo(savedMember.getId());
+            assertThat(result.getNickname()).isEqualTo(TEST_NICKNAME);
 
-            System.out.println("accessToken = " + result.accessToken());
+            System.out.println("accessToken = " + result.getAccessToken());
         }
 
         @Test
@@ -88,7 +88,7 @@ class AuthServiceTest {
                     new LoginRequest(TEST_EMAIL, TEST_PASSWORD));
 
             // then: 토큰 파싱하여 페이로드 검증
-            var payload = jwtTokenProvider.getPayload(result.accessToken());
+            var payload = jwtTokenProvider.getPayload(result.getAccessToken());
             assertThat(payload).isNotNull();
             assertThat(payload.get("id", Integer.class))
                     .isEqualTo(savedMember.getId());
@@ -102,7 +102,7 @@ class AuthServiceTest {
             LoginResult result = authService.login(
                     new LoginRequest(TEST_EMAIL, TEST_PASSWORD));
 
-            var payload = jwtTokenProvider.getPayload(result.accessToken());
+            var payload = jwtTokenProvider.getPayload(result.getAccessToken());
             assertThat(payload).isNotNull();
             assertThat(payload.containsKey("email")).isFalse();
             assertThat(payload.containsKey("passwordHash")).isFalse();
