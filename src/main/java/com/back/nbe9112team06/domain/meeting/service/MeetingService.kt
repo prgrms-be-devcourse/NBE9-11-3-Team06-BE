@@ -152,13 +152,9 @@ class MeetingService(
         )
     }
 
-    private fun generateUniqueUrl(): String {
-        var candidate = randomString(URL_LENGTH)
-        while (meetingRepository.existsByRandomUrl(candidate)) {
-            candidate = randomString(URL_LENGTH)
-        }
-        return candidate
-    }
+    private fun generateUniqueUrl(): String =
+        generateSequence { randomString(URL_LENGTH) }
+            .first { !meetingRepository.existsByRandomUrl(it) }
 
     private fun randomString(length: Int): String {
         val builder = StringBuilder(length)
