@@ -5,6 +5,7 @@ import com.back.nbe9112team06.domain.timeblock.repository.TimeBlockRepository
 import com.back.nbe9112team06.domain.timetable.entity.DateInfo
 import com.back.nbe9112team06.domain.timetable.entity.TimeInfo
 import com.back.nbe9112team06.domain.timetable.repository.TimeTableRepository
+import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -18,10 +19,10 @@ import java.time.LocalTime
 @DisplayName("TimeTableService 단위 테스트")
 class TimeTableServiceUnitTest {
 
-    @io.mockk.impl.annotations.MockK
+    @MockK
     lateinit var timeTableRepository: TimeTableRepository
 
-    @io.mockk.impl.annotations.MockK
+    @MockK
     lateinit var timeBlockRepository: TimeBlockRepository
 
     private val service by lazy {
