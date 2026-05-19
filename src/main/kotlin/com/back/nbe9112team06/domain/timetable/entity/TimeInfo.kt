@@ -8,7 +8,9 @@ import java.time.LocalTime
 
 @Entity
 class TimeInfo(
-    @field:JoinColumn(name = "date_id") @field:ManyToOne(fetch = FetchType.LAZY) var dateInfo: DateInfo,
+    @JoinColumn(name = "date_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    var dateInfo: DateInfo,
     var time: LocalTime
 ) : BaseEntity() {
 

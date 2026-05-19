@@ -19,8 +19,8 @@ class AuthService(
 
     @Transactional
     fun login(request: LoginRequest): LoginResult {
-        val member = memberService.findByEmail(request.email)
-            .orElseThrow { BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS) }
+        val member = memberService.findByEmail(request.email) ?:
+        throw BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS)
 
         if (!passwordEncoder.matches(request.password, member.passwordHash)) {
             throw BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS)

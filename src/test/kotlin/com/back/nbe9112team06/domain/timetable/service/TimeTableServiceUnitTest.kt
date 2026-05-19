@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
 import java.time.LocalTime
 
+
 @ExtendWith(MockKExtension::class)
 @DisplayName("TimeTableService 단위 테스트")
 class TimeTableServiceUnitTest {
