@@ -5,16 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.UnknownHostException
 
 @RestController
 @Tag(name = "Home", description = "홈 컨트롤러, API서버 메인 페이지로 사용")
 class HomeController {
     @GetMapping(produces = [MediaType.TEXT_HTML_VALUE])
     @Operation(summary = "메인 페이지", description = "API 서버의 메인 페이지입니다. 서버의 IP 주소와 호스트 이름을 표시합니다.")
-    @Throws(
-        UnknownHostException::class
-    )
     fun home(): String {
         return """
                 <h1>Welcome to Let's schedule it</h1>

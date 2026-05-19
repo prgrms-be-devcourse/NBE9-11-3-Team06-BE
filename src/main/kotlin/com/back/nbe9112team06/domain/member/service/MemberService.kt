@@ -6,11 +6,10 @@ import com.back.nbe9112team06.domain.member.entity.Member
 import com.back.nbe9112team06.domain.member.repository.MemberRepository
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.Optional
 
 @Service
 class MemberService(
@@ -50,5 +49,5 @@ class MemberService(
 
     fun findById(memberId: Int): Member? = memberRepository.findByIdOrNull(memberId)
 
-    fun findByEmail(email: String): Optional<Member> = memberRepository.findByEmail(email)
+    fun findByEmail(email: String): Member? = memberRepository.findByEmail(email)
 }
