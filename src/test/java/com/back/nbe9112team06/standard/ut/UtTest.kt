@@ -72,7 +72,7 @@ internal class UtTest {
 
             // then
             assertThat(payload).isNotNull()
-            assertThat(payload?.get("id", Int::class.java)).isEqualTo(1)
+            assertThat(payload?.get("id", Int::class.javaObjectType)).isEqualTo(1)
             assertThat(payload?.get("nickname", String::class.java)).isEqualTo("테스터")
         }
 
@@ -83,7 +83,7 @@ internal class UtTest {
             val jwt = Ut.toString(JWT_SECRET, 3600L, mapOf("id" to 1))
 
             // when: DIFFERENT_SECRET으로 검증 시도
-            val payload: Claims? = Ut.payloadOrNull(jwt, JWT_SECRET)
+            val payload: Claims? = Ut.payloadOrNull(jwt, DIFFERENT_SECRET)
 
             // then
             assertThat(payload).isNull()

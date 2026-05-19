@@ -92,7 +92,7 @@ class AuthServiceTest {
             // then: 토큰 파싱하여 페이로드 검증
             val payload = jwtTokenProvider.getPayload(result.accessToken)
             assertThat(payload).isNotNull()
-            assertThat(payload!!.get("id", Int::class.java))
+            assertThat(payload!!.get("id", Int::class.javaObjectType))
                 .isEqualTo(savedMember.id)
             assertThat(payload.get("nickname", String::class.java))
                 .isEqualTo(TEST_NICKNAME)
@@ -118,7 +118,7 @@ class AuthServiceTest {
         @Test
         @DisplayName("t5: 비밀번호 오류 → BusinessException(AUTH-004)")
         fun t5_wrongPassword_throwsBusinessException() {
-            assertThatThrownBy{
+            assertThatThrownBy {
                 authService.login(
                     LoginRequest(
                         TEST_EMAIL,
@@ -136,7 +136,7 @@ class AuthServiceTest {
         @Test
         @DisplayName("t6: 존재하지 않는 이메일 → BusinessException(AUTH-004)")
         fun t6_notExistEmail_throwsBusinessException() {
-            assertThatThrownBy{
+            assertThatThrownBy {
                 authService.login(
                     LoginRequest(
                         "ghost@example.com",

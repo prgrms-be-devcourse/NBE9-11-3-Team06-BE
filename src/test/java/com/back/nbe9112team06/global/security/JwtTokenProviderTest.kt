@@ -86,7 +86,7 @@ internal class JwtTokenProviderTest {
             val payload = jwtTokenProvider.getPayload(token)
 
             assertThat(payload).isNotNull() // not null 확인했으므로 아래에 !!해야한다.
-            assertThat(payload!!.get("id", Int::class.java)).isEqualTo(m.id)
+            assertThat(payload!!.get("id", Int::class.javaObjectType)).isEqualTo(m.id)
         }
 
         @Test
