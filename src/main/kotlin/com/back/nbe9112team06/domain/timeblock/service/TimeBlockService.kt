@@ -72,7 +72,7 @@ class TimeBlockService(
             times.forEach { time ->
 
                 val availableTime =
-                    AvailableTime.create(availableDateTime, timeBlock, meeting, time)
+                    AvailableTime.create(availableDateTime, timeBlock, meeting, timeBlock.participant, time)
                 availableDateTime.availableTimes.add(availableTime)
                 availableTimeRepository.save(availableTime)
             }
@@ -109,7 +109,7 @@ class TimeBlockService(
     // 참여자 목록
     @Transactional(readOnly = true)
     fun getParticipantSchedules(meetingId: Int): List<ParticipantsScheduleResponse> {
-        val timeBlocks = timeBlockRepository.findWithAll(meetingId)
+        val timeBlocks = timeBlockRepository.findByMeetingId(meetingId)
 
         return timeBlocks.map { timeBlock ->
             val name = timeBlock.participant.guestName

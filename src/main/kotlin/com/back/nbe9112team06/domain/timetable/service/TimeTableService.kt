@@ -1,8 +1,7 @@
 package com.back.nbe9112team06.domain.timetable.service
 
 import com.back.nbe9112team06.domain.adjustresult.entity.AdjustResult
-import com.back.nbe9112team06.domain.timeblock.entity.TimeBlock
-import com.back.nbe9112team06.domain.timeblock.repository.TimeBlockRepository
+import com.back.nbe9112team06.domain.timeblock.repository.AvailableTimeRepository
 import com.back.nbe9112team06.domain.timetable.dto.DateResponse
 import com.back.nbe9112team06.domain.timetable.dto.RecommendedScheduleResponse
 import com.back.nbe9112team06.domain.timetable.dto.TimeResponse
@@ -15,86 +14,53 @@ import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Service
 class TimeTableService(
     private val timeTableRepository: TimeTableRepository,
-    private val timeBlockRepository: TimeBlockRepository
+    private val availableTimeRepository: AvailableTimeRepository
 ) {
 
     // 개인 가능일정 통합
     @Transactional
     fun aggregate(meetingId: Int) {
 
-        val timeTable = timeTableRepository.findByMeetingIdForUpdate(meetingId)
+        val timeTable = timeTableRepository
+            .findByMeetingId(meetingId)
             ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
         timeTable.dateInfos.clear()
 
-        // key: 날짜+시간, value: 참가자 이름 리스트
-        val timeToParticipantsNames = mutableMapOf<LocalDateTime, MutableList<String>>()
+        val availableTimes = availableTimeRepository
+            .findByMeetingId(meetingId)
 
-        val timeBlocks = findWithAll(meetingId)
+        availableTimes
+            .groupBy { it.availableDateTime.date }
+            .forEach { (date, timesByDate) ->
 
-        for (timeBlock in timeBlocks) {
+                val dateInfo = DateInfo(timeTable, date)
+                    .also { timeTable.dateInfos.add(it) }
 
+                timesByDate
+                    .groupBy { it.time }
+                    .forEach { (time, slotTimes) ->
 
-            val participantName = timeBlock.participant.guestName
+                        val timeInfo = TimeInfo(dateInfo, time)
+                            .also { dateInfo.timeInfos.add(it) }
 
-            for (availableDateTime in timeBlock.availableDateTimes) {
+                        slotTimes.forEach { availableTime ->
 
-                val date = availableDateTime.date
-
-                for (availableTime in availableDateTime.availableTimes) {
-
-                    val key = LocalDateTime.of(date, availableTime.time)
-
-                    timeToParticipantsNames
-                        .computeIfAbsent(key) { mutableListOf() }
-                        .add(participantName)
-                }
+                            AdjustResult(
+                                timeInfo,
+                                availableTime.participant.guestName
+                            ).also {
+                                timeInfo.adjustResultList.add(it)
+                            }
+                        }
+                    }
             }
-        }
-
-        // key: 날짜, value: 해당 날짜의 시간 엔트리
-        val dateMap =
-            mutableMapOf<LocalDate, MutableList<Map.Entry<LocalDateTime, MutableList<String>>>>()
-
-        for (entry in timeToParticipantsNames.entries) {
-
-            val date = entry.key.toLocalDate()
-
-            dateMap
-                .computeIfAbsent(date) { mutableListOf() }
-                .add(entry)
-        }
-
-        for ((date, timeEntries) in dateMap) {
-
-            val dateInfo = DateInfo(timeTable, date)
-                .also { timeTable.dateInfos.add(it) }
-
-            for ((dateTime, participantNames) in timeEntries) {
-
-                val timeInfo = TimeInfo(dateInfo, dateTime.toLocalTime())
-                    .also { dateInfo.timeInfos.add(it) }
-
-                for (participantName in participantNames) {
-
-                    val adjustResult = AdjustResult(timeInfo, participantName)
-                        .also {timeInfo.adjustResultList.add(it)}
-                }
-            }
-        }
 
         timeTableRepository.save(timeTable)
-    }
-
-    // meetingId로 TimeTable 검색
-    fun findByMeetingId(meetingId: Int): List<TimeTable> {
-        return timeTableRepository.findByMeetingId(meetingId)
     }
 
     // timetable 저장
@@ -102,31 +68,14 @@ class TimeTableService(
         timeTableRepository.save(timeTable)
     }
 
-    // 해당 모임의 TimeTable 초기화
-    @Transactional
-    fun deleteAllByMeetingId(meetingId: Int) {
-
-        val tables = timeTableRepository.findByMeetingId(meetingId)
-
-        timeTableRepository.deleteAll(tables)
-    }
-
-    // 타임블록 DB 에서 데이터 꺼내기
-    fun findWithAll(meetingId: Int): List<TimeBlock> {
-        return timeBlockRepository.findWithAll(meetingId)
-    }
 
     // 미팅 ID로 TimeTable 반환
     @Transactional(readOnly = true)
     fun getTimeTable(meetingId: Int): TimeTableResponse {
 
-        val tables = timeTableRepository.findByMeetingId(meetingId)
+        val table = timeTableRepository.findByMeetingId(meetingId)
+            ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
-        if (tables.isEmpty()) {
-            throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
-        }
-
-        val table = tables[0]
 
         val dateResponses = mutableListOf<DateResponse>()
 
@@ -166,13 +115,8 @@ class TimeTableService(
     @Transactional
     fun recommend(meetingId: Int): List<RecommendedScheduleResponse> {
 
-        val tables = timeTableRepository.findByMeetingId(meetingId)
-
-        if (tables.isEmpty()) {
-            return emptyList()
-        }
-
-        val table = tables[0]
+        val table = timeTableRepository.findByMeetingId(meetingId)
+            ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
 
         // 회의 시간(분) -> 슬롯 수
         val windowSize = table.meeting.duration / 30

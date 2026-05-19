@@ -426,7 +426,7 @@ class TimeBlockServiceTest {
 
         @Test
         fun `등록된 TimeBlock이 없으면 빈 리스트를 반환한다`() {
-            every { timeBlockRepository.findWithAll(1) } returns emptyList()
+            every { timeBlockRepository.findByMeetingId(1) } returns emptyList()
 
             val result = service.getParticipantSchedules(1)
 
@@ -446,7 +446,7 @@ class TimeBlockServiceTest {
                 times = listOf(LocalTime.of(14, 0), LocalTime.of(14, 30), LocalTime.of(15, 0)),
             )
 
-            every { timeBlockRepository.findWithAll(1) } returns listOf(timeBlock)
+            every { timeBlockRepository.findByMeetingId(1) } returns listOf(timeBlock)
 
             val result = service.getParticipantSchedules(1)
 
@@ -471,7 +471,7 @@ class TimeBlockServiceTest {
                 times = listOf(LocalTime.of(15, 0), LocalTime.of(14, 0), LocalTime.of(14, 30)),
             )
 
-            every { timeBlockRepository.findWithAll(1) } returns listOf(timeBlock)
+            every { timeBlockRepository.findByMeetingId(1) } returns listOf(timeBlock)
 
             val result = service.getParticipantSchedules(1)
 
@@ -497,7 +497,7 @@ class TimeBlockServiceTest {
                 ),
             )
 
-            every { timeBlockRepository.findWithAll(1) } returns listOf(timeBlock)
+            every { timeBlockRepository.findByMeetingId(1) } returns listOf(timeBlock)
 
             val result = service.getParticipantSchedules(1)
 
@@ -518,7 +518,7 @@ class TimeBlockServiceTest {
             val tb1 = buildTimeBlockWithSlots(meeting, p1, date, listOf(LocalTime.of(14, 0)))
             val tb2 = buildTimeBlockWithSlots(meeting, p2, date, listOf(LocalTime.of(15, 0)))
 
-            every { timeBlockRepository.findWithAll(1) } returns listOf(tb1, tb2)
+            every { timeBlockRepository.findByMeetingId(1) } returns listOf(tb1, tb2)
 
             val result = service.getParticipantSchedules(1)
 
@@ -536,7 +536,7 @@ class TimeBlockServiceTest {
             val timeBlock = TimeBlock.create(meeting, participant)
             val adt = AvailableDateTime.create(timeBlock, meeting, date)
             times.forEach { t ->
-                val at = AvailableTime.create(adt, timeBlock, meeting, t)
+                val at = AvailableTime.create(adt, timeBlock, meeting, timeBlock.participant,t)
                 adt.availableTimes += at
             }
             timeBlock.availableDateTimes += adt
@@ -553,7 +553,7 @@ class TimeBlockServiceTest {
             dateToTimes.forEach { (date, times) ->
                 val adt = AvailableDateTime.create(timeBlock, meeting, date)
                 times.forEach { t ->
-                    val at = AvailableTime.create(adt, timeBlock, meeting, t)
+                    val at = AvailableTime.create(adt, timeBlock, meeting, timeBlock.participant, t)
                     adt.availableTimes += at
                 }
                 timeBlock.availableDateTimes += adt
