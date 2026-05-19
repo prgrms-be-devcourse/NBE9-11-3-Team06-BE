@@ -21,12 +21,4 @@ class Participant(
         this.meeting = meeting
     }
 
-<<<<<<< HEAD
-    companion object {
-        fun create(guestName: String, guestPassword: String): Participant {
-            return Participant(guestName, guestPassword)
-        }
-    }
-=======
->>>>>>> 25b72a3 (refactor: Participant 도메인 테스트 Kotlin 마이그레이션 및 기능 개선)
 }
