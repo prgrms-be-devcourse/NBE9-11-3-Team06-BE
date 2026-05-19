@@ -156,7 +156,7 @@ class AuthControllerTest {
         }
 
         @Test
-        @DisplayName("t8: 비밀번호 누락 → 400, errorCode=COMMON-009")
+        @DisplayName("t8: 비밀번호 누락 → 400, errorCode=COMMON-002")
         void t8_missingPassword_400() throws Exception {
             String body = jsonMapper.writeValueAsString(
                     Map.of("email", TEST_EMAIL)
@@ -166,7 +166,7 @@ class AuthControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(body))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errorCode").value("COMMON-009"));
+                    .andExpect(jsonPath("$.errorCode").value("COMMON-002"));
         }
 
         @Test

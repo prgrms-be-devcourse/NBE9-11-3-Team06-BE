@@ -128,6 +128,42 @@ class ParticipantControllerTest {
     }
 
     @Test
+    @DisplayName("모임방 참가 - guestName 필드 자체가 없으면 400을 반환한다")
+    void joinMeeting_fail_whenGuestNameMissing() throws Exception {
+        String roomUrl = createMeetingAndGetRoomUrl("creator5@example.com", "creator5");
+
+        mvc.perform(
+                        post("/api/meetings/{randomUrl}/participants", roomUrl)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "guestPassword": "1234"
+                                        }
+                                        """)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("모임방 참가 - guestPassword 필드 자체가 없으면 400을 반환한다")
+    void joinMeeting_fail_whenGuestPasswordMissing() throws Exception {
+        String roomUrl = createMeetingAndGetRoomUrl("creator6@example.com", "creator6");
+
+        mvc.perform(
+                        post("/api/meetings/{randomUrl}/participants", roomUrl)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "guestName": "홍길동"
+                                        }
+                                        """)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("모임방 참가 - 유효하지 않은 토큰 쿠키가 있어도 permitAll로 참가 가능하다")
     void joinMeeting_success_evenWithInvalidTokenCookie() throws Exception {
         String roomUrl = createMeetingAndGetRoomUrl("creator4@example.com", "creator4");
