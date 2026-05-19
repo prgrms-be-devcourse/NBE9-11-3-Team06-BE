@@ -50,8 +50,8 @@ class AuthTokenHelper {
      */
     fun createTokenWithPayload(customPayload: Map<String, Any>): String {
         return Ut.toString(
-            TestConstants.JWT_SECRET,
-            TestConstants.DEFAULT_EXPIRE_SECONDS,
+            JWT_SECRET,
+            DEFAULT_EXPIRE_SECONDS,
             customPayload
         )
     }
