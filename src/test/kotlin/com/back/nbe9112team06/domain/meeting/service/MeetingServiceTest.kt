@@ -10,6 +10,7 @@ import com.back.nbe9112team06.domain.member.entity.Member
 import com.back.nbe9112team06.domain.member.entity.TimezoneType
 import com.back.nbe9112team06.domain.member.service.MemberService
 import com.back.nbe9112team06.domain.participant.entity.Participant
+import com.back.nbe9112team06.domain.timetable.service.TimeTableService
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
 import io.mockk.every
@@ -30,7 +31,8 @@ class MeetingServiceTest {
 
     private val meetingRepository = mockk<MeetingRepository>()
     private val memberService = mockk<MemberService>()
-    private val meetingService = MeetingService(meetingRepository, memberService)
+    private val timeTableService = mockk<TimeTableService>()
+    private val meetingService = MeetingService(meetingRepository, memberService, timeTableService)
 
     companion object {
         private const val MEETING_ID = 1
@@ -81,6 +83,7 @@ class MeetingServiceTest {
             val savedMeeting = Meeting("새 모임", "STUDY", 60, host, "generatedUrl")
                 .also { ReflectionTestUtils.setField(it, "id", MEETING_ID) }
             every { meetingRepository.save(any()) } returns savedMeeting
+            justRun { timeTableService.save(any()) }
 
             val request = MeetingCreateRequest("새 모임", listOf(LocalDate.of(2026, 4, 20)), 60, "STUDY")
 
