@@ -27,7 +27,6 @@ class TimeBlock(
     val availableDateTimes: MutableList<AvailableDateTime> = mutableListOf()
 
     companion object {
-        @JvmStatic
         fun create(meeting: Meeting, participant: Participant): TimeBlock =
             TimeBlock(
                 meeting = meeting,

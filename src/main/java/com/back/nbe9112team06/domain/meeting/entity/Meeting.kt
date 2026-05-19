@@ -10,8 +10,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Entity
-// TODO: Phase 2 - 테스트 코드 Kotlin 변환 완료 후 @JvmOverloads 제거
-class Meeting @JvmOverloads constructor(
+class Meeting (
     var title: String,
     var category: String,
     var duration: Int,
@@ -42,8 +41,8 @@ class Meeting @JvmOverloads constructor(
     @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
     val timeBlocks: MutableList<TimeBlock> = mutableListOf(),
 
-    @OneToMany(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
-    val timeTables: MutableList<TimeTable> = mutableListOf()
+    @OneToOne(mappedBy = "meeting", cascade = [CascadeType.PERSIST, CascadeType.REMOVE], orphanRemoval = true)
+    val timeTables: TimeTable? = null
 
 ) : BaseEntity() {
 

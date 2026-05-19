@@ -2,11 +2,7 @@ package com.back.nbe9112team06.domain.timeblock.entity
 
 import com.back.nbe9112team06.domain.meeting.entity.Meeting
 import com.back.nbe9112team06.global.entity.BaseEntity
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 import java.time.LocalTime
 
 @Entity
@@ -32,7 +28,6 @@ class AvailableTime(
     ) : BaseEntity() {
 
     companion object {
-        @JvmStatic
         fun create(
             availableDateTime: AvailableDateTime,
             timeBlock: TimeBlock,

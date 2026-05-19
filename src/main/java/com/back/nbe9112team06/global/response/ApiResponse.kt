@@ -2,7 +2,6 @@ package com.back.nbe9112team06.global.response
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 
-@JvmRecord
 data class ApiResponse<T>(
     val resultCode: String,
     val msg: String,
