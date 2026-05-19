@@ -50,8 +50,6 @@ class ParticipantController(
     fun joinMeeting(
         @PathVariable randomUrl: String,
         @RequestBody @Valid request: ParticipantJoinRequest
-    ): ApiResponse<ParticipantJoinResponse> {
-        val response = participantService.joinMeeting(randomUrl, request)
-        return ApiResponse("201-1", "모임방 참가 성공", response)
-    }
+    ): ApiResponse<ParticipantJoinResponse> =
+        ApiResponse("201-1", "모임방 참가 성공", participantService.joinMeeting(randomUrl, request))
 }

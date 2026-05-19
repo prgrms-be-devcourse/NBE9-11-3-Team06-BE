@@ -21,11 +21,16 @@ class ParticipantService(
     fun joinMeeting(randomUrl: String, request: ParticipantJoinRequest): ParticipantJoinResponse {
         val meeting = meetingService.getMeetingByRandomUrlOrThrow(randomUrl)
 
+        if (participantRepository.findByMeetingAndGuestNameAndGuestPassword(meeting, request.guestName, request.guestPassword) != null) {
+            throw BusinessException(ErrorCode.DUPLICATE_PARTICIPANT)
+        }
+
         val participant = Participant(request.guestName, request.guestPassword)
         meeting.addParticipant(participant)
 
-        val saved = participantRepository.save(participant)
-        return ParticipantJoinResponse(saved.id, saved.guestName)
+        return with(participantRepository.save(participant)) {
+            ParticipantJoinResponse(id, guestName)
+        }
     }
 
     @Transactional(readOnly = true)

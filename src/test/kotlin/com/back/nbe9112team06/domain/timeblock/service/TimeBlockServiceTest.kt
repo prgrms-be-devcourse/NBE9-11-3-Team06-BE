@@ -82,7 +82,7 @@ class TimeBlockServiceTest {
         io.mockk.mockk<Meeting>(relaxed = true) { every { this@mockk.id } returns id }
 
     private fun newParticipant(id: Int, name: String, password: String): Participant =
-        Participant.create(name, password).also { ReflectionTestUtils.setField(it, "id", id) }
+        Participant(name, password).also { ReflectionTestUtils.setField(it, "id", id) }
 
     // BusinessException의 errorCode가 일치하는지(status / code / message) 검증
     private fun assertBusinessException(
