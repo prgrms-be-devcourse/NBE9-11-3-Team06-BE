@@ -23,8 +23,8 @@ class CustomUserDetailsService(
         return memberRepository.findByEmail(email)
             ?.let{ member ->
                 SecurityUser(
-                    id = member.get().id,
-                    nickname = member.get().getName()
+                    id = member.id,
+                    nickname = member.getName()
                 )
             }
             ?: throw UsernameNotFoundException("도달하면 안 되는 경로: $email")

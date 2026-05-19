@@ -7,7 +7,8 @@ import java.time.LocalDate
 
 @Entity
 class DateInfo(
-    @field:JoinColumn(name = "time_table_id") @field:ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "time_table_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     var timeTable: TimeTable,
     var date: LocalDate
 ) : BaseEntity() {

@@ -7,12 +7,12 @@ import java.time.LocalTime
 @Schema(description = "연속된 가능 시간 범위 데이터")
 data class TimeRangeResponse(
 
-    @field:Schema(description = "날짜 (yyyy-MM-dd)", example = "2026-04-20")
+    @Schema(description = "날짜 (yyyy-MM-dd)", example = "2026-04-20")
     val date: LocalDate,
 
-    @field:Schema(description = "시작 시간 (HH:mm)", example = "14:00")
+    @Schema(description = "시작 시간 (HH:mm)", example = "14:00")
     val startTime: LocalTime,
 
-    @field:Schema(description = "종료 시간 (HH:mm)", example = "15:30")
+    @Schema(description = "종료 시간 (HH:mm)", example = "15:30")
     val endTime: LocalTime,
 )
