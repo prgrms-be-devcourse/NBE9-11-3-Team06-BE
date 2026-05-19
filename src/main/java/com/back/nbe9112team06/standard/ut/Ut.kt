@@ -14,7 +14,6 @@ class Ut private constructor() {
     }
 
     companion object {
-        @JvmStatic
         fun toString(
             secret: String,
             expireSeconds: Long,
@@ -39,7 +38,6 @@ class Ut private constructor() {
         }
 
         // parseSignedClaims로 서명 검증 + 만료 검증 자동 처리
-        @JvmStatic
         fun payloadOrNull(token: String, secret: String): Claims? {
             try {
                 return Jwts.parser()
@@ -55,7 +53,6 @@ class Ut private constructor() {
         }
 
         // validate는 payloadOrNull 재사용으로 단순화
-        @JvmStatic
         fun isValid(token: String, secret: String): Boolean {
             return payloadOrNull(token, secret) != null
         }

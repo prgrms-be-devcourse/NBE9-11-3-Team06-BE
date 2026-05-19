@@ -174,7 +174,6 @@ enum class ErrorCode(
     // 가장 기본: detail + instance 직접 지정
     // detail도 기본 message 사용
     // instance 생략
-    @JvmOverloads
     fun toProblemDetail(
         detail: String = this.message,
         instance: String? = null

@@ -13,7 +13,6 @@ data class SignupResponse(
     val nickname: String,
 ) {
     companion object {
-        @JvmStatic
         fun from(member: Member): SignupResponse =
             SignupResponse(
                 email = member.email,
