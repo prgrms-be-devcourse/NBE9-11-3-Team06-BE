@@ -52,10 +52,8 @@ class MeetingController(
             examples = [ExampleObject(name = "success", value = GET_MY_MEETINGS_SUCCESS_JSON)]
         )]
     )
-    fun getMyMeetings(): ApiResponse<List<MeetingEntryResponse>> {
-        val memberId = rq.getActor().id
-        return ApiResponse("200-1", "모임 목록 조회 성공", meetingService.getMyMeetings(memberId))
-    }
+    fun getMyMeetings(): ApiResponse<List<MeetingEntryResponse>> =
+        ApiResponse("200-1", "모임 목록 조회 성공", meetingService.getMyMeetings(rq.getActor().id))
 
     // ── 모임 생성 (develop) ──────────────────────────────
     @PostMapping
@@ -84,8 +82,7 @@ class MeetingController(
     )
     fun createMeeting(@RequestBody @Valid request: MeetingCreateRequest): ApiResponse<MeetingCreateResponse> {
         val memberId = rq.getActor().id
-        val response = meetingService.createMeeting(memberId, request)
-        return ApiResponse("201-1", "모임방 생성 성공", response)
+        return ApiResponse("201-1", "모임방 생성 성공", meetingService.createMeeting(memberId, request))
     }
 
     @GetMapping("/{randomUrl}")
@@ -101,10 +98,8 @@ class MeetingController(
             examples = [ExampleObject(name = "success", value = GET_MEETING_BY_URL_SUCCESS_JSON)]
         )]
     )
-    fun getMeetingByRandomUrl(@PathVariable randomUrl: String): ApiResponse<MeetingEntryResponse> {
-        val response = meetingService.getMeetingByRandomUrl(randomUrl)
-        return ApiResponse("200-1", "모임방 조회 성공", response)
-    }
+    fun getMeetingByRandomUrl(@PathVariable randomUrl: String): ApiResponse<MeetingEntryResponse> =
+        ApiResponse("200-1", "모임방 조회 성공", meetingService.getMeetingByRandomUrl(randomUrl))
 
     @GetMapping("/{randomUrl}/check-creator")
     @Operation(summary = "해당 방의 방장인지 여부 조회", description = "로그인한 사용자가 해당 모임의 생성자(방장)인지 확인합니다.")
@@ -124,8 +119,7 @@ class MeetingController(
         )]
     )
     fun checkCreator(@PathVariable randomUrl: String): ApiResponse<HostCheckResponse> {
-        val memberId = rq.getActor().id
-        val isHost = meetingService.checkIsHost(randomUrl, memberId)
+        val isHost = meetingService.checkIsHost(randomUrl, rq.getActor().id)
         return ApiResponse(
             "200-1",
             if (isHost) "방장이 맞습니다." else "방장이 아닙니다.",
@@ -217,7 +211,6 @@ class MeetingController(
             examples = [ExampleObject(name = "success", value = GET_CONFIRMED_SCHEDULE_SUCCESS_JSON)]
         )]
     )
-    fun getConfirmedSchedule(@PathVariable meetingId: Int): ApiResponse<ConfirmedScheduleResponse> {
-        return ApiResponse("200-1", "확정된 일정입니다.", meetingService.getConfirmedSchedule(meetingId))
-    }
+    fun getConfirmedSchedule(@PathVariable meetingId: Int): ApiResponse<ConfirmedScheduleResponse> =
+        ApiResponse("200-1", "확정된 일정입니다.", meetingService.getConfirmedSchedule(meetingId))
 }

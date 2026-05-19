@@ -218,7 +218,7 @@ class MemberServiceTest {
     inner class FindById {
 
         @Test
-        fun `존재하는 ID로 조회하면 Optional에 Member가 담겨 반환된다`() {
+        fun `존재하는 ID로 조회하면 Member를 반환한다`() {
             // given
             val memberId = 1
             val member = Member(testEmail, hashedPassword, testNickname, TimezoneType.ASIA_SEOUL)
@@ -228,12 +228,11 @@ class MemberServiceTest {
             val result = memberService.findById(memberId)
 
             // then
-            assertThat(result).isPresent
-            assertThat(result.get()).isSameAs(member)
+            assertThat(result).isNotNull().isSameAs(member)
         }
 
         @Test
-        fun `존재하지 않는 ID로 조회하면 빈 Optional을 반환한다`() {
+        fun `존재하지 않는 ID로 조회하면 null을 반환한다`() {
             // given
             every { memberRepository.findById(any()) } returns Optional.empty()
 
@@ -241,7 +240,7 @@ class MemberServiceTest {
             val result = memberService.findById(999)
 
             // then
-            assertThat(result).isEmpty
+            assertThat(result).isNull()
         }
     }
 
