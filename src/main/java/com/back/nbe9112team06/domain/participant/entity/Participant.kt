@@ -21,9 +21,4 @@ class Participant(
         this.meeting = meeting
     }
 
-    companion object {
-        fun create(guestName: String, guestPassword: String): Participant {
-            return Participant(guestName, guestPassword)
-        }
-    }
 }

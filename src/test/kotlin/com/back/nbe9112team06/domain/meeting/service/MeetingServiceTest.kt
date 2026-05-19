@@ -57,7 +57,7 @@ class MeetingServiceTest {
         buildMeeting(status).apply {
             repeat(count) { i ->
                 participants.add(
-                    Participant.create("guest$i", "pass$i")
+                    Participant("guest$i", "pass$i")
                         .also { ReflectionTestUtils.setField(it, "id", 100 + i) }
                 )
             }
