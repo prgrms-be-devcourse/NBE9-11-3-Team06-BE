@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Entity
-class Meeting (
+class Meeting(
     var title: String,
     var category: String,
     var duration: Int,

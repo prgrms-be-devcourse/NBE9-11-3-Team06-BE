@@ -7,6 +7,7 @@ import com.back.nbe9112team06.domain.member.repository.MemberRepository
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.Optional
@@ -38,9 +39,8 @@ class MemberService(
     // 회원 탈퇴
     @Transactional
     fun deleteMember(memberId: Int) {
-        val member = memberRepository.findById(memberId)
-            .orElseThrow { BusinessException(ErrorCode.NOT_FOUND) }
-
+        val member = memberRepository.findByIdOrNull(memberId)
+            ?: throw BusinessException(ErrorCode.NOT_FOUND)
         memberRepository.delete(member)
     }
 
@@ -48,8 +48,7 @@ class MemberService(
     fun checkEmail(request: CheckEmailRequest): Boolean =
         memberRepository.existsByEmail(request.email)
 
-    // 조회 메서드 (Optional 유지 - Java 호출 측 호환)
-    fun findById(memberId: Int): Optional<Member> = memberRepository.findById(memberId)
+    fun findById(memberId: Int): Member? = memberRepository.findByIdOrNull(memberId)
 
     fun findByEmail(email: String): Optional<Member> = memberRepository.findByEmail(email)
 }

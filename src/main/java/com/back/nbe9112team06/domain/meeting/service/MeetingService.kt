@@ -30,9 +30,8 @@ class MeetingService(
     // ── 모임 생성 ──────────────────────────────
     @Transactional
     fun createMeeting(memberId: Int, request: MeetingCreateRequest): MeetingCreateResponse {
-        // TODO: Phase 2 - MemberService.findById()를 Optional 대신 Kotlin nullable 반환으로 변경하고 orElseThrow 제거
         val member = memberService.findById(memberId)
-            .orElseThrow { BusinessException(ErrorCode.MEMBER_NOT_FOUND) }
+            ?: throw BusinessException(ErrorCode.MEMBER_NOT_FOUND)
 
         val randomUrl = generateUniqueUrl()
         val meeting = Meeting(
@@ -48,10 +47,7 @@ class MeetingService(
         }
 
         val saved = meetingRepository.save(meeting)
-
-        val timeTable = TimeTable(meeting, mutableListOf())
-        timeTableService.save(timeTable)
-
+        timeTableService.save(TimeTable(saved, mutableListOf()))
         return MeetingCreateResponse(saved.id, saved.randomUrl)
     }
 
@@ -68,10 +64,8 @@ class MeetingService(
     }
 
     @Transactional(readOnly = true)
-    fun checkIsHost(randomUrl: String, memberId: Int): Boolean {
-        val meeting = findMeetingByRandomUrlInternal(randomUrl)
-        return meeting.isHost(memberId)
-    }
+    fun checkIsHost(randomUrl: String, memberId: Int): Boolean =
+        findMeetingByRandomUrlInternal(randomUrl).isHost(memberId)
 
     // ── 일정 확정 ──────────────────────────────
     @Transactional
@@ -108,18 +102,10 @@ class MeetingService(
     @Transactional(readOnly = true)
     fun getConfirmedSchedule(meetingId: Int): ConfirmedScheduleResponse {
         val meeting = findMeetingInternal(meetingId)
-
-        if (meeting.status != MeetingStatus.CONFIRMED || meeting.confirmedDate == null) {
-            throw BusinessException(ErrorCode.NOT_CONFIRMED)
-        }
-
-        return ConfirmedScheduleResponse.from(
-            meeting.confirmedDate!!,
-            meeting.confirmedTime!!,
-            meeting.status,
-            meeting.title,
-            meeting.duration
-        )
+        val date = meeting.confirmedDate?.takeIf { meeting.status == MeetingStatus.CONFIRMED }
+            ?: throw BusinessException(ErrorCode.NOT_CONFIRMED)
+        val time = meeting.confirmedTime ?: throw BusinessException(ErrorCode.NOT_CONFIRMED)
+        return ConfirmedScheduleResponse.from(date, time, meeting.status, meeting.title, meeting.duration)
     }
 
     // ── 목록 조회 ──────────────────────────────
@@ -162,14 +148,8 @@ class MeetingService(
         generateSequence { randomString(URL_LENGTH) }
             .first { !meetingRepository.existsByRandomUrl(it) }
 
-    private fun randomString(length: Int): String {
-        val builder = StringBuilder(length)
-        repeat(length) {
-            val idx = secureRandom.nextInt(URL_CHAR_POOL.length)
-            builder.append(URL_CHAR_POOL[idx])
-        }
-        return builder.toString()
-    }
+    private fun randomString(length: Int): String =
+        CharArray(length) { URL_CHAR_POOL[secureRandom.nextInt(URL_CHAR_POOL.length)] }.concatToString()
 
     private fun findMeetingInternal(meetingId: Int): Meeting =
         meetingRepository.findByIdOrNull(meetingId) ?: throw BusinessException(ErrorCode.MEETING_NOT_FOUND)
