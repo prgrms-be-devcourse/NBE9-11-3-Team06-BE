@@ -85,21 +85,21 @@ VALUES
 -- =========================
 -- 5️⃣ AVAILABLE_TIME
 -- =========================
-INSERT INTO available_time (id, time, available_date_time_id, meeting_id, time_block_id, participant_id, created_by, created_at, modified_at)
+INSERT INTO available_time (id, time, available_date_time_id, meeting_id, time_block_id, created_by, created_at, modified_at)
 VALUES
 -- meeting1
-(1, '09:00', 1, 1, 1, 1, '철수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(2, '09:30', 1, 1, 1, 1, '철수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(3, '09:00', 2, 1, 2, 2, '영희', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(4, '11:00', 3, 1, 3, 3, '민수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, '09:00', 1, 1, 1, '철수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(2, '09:30', 1, 1, 1, '철수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, '09:00', 2, 1, 2, '영희', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(4, '11:00', 3, 1, 3, '민수', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
 -- meeting2
-(5, '10:00', 4, 2, 4, 4, '지훈', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(6, '10:00', 5, 2, 5, 5, '수지', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(5, '10:00', 4, 2, 4, '지훈', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(6, '10:00', 5, 2, 5, '수지', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
 -- meeting3
-(7, '09:00', 6, 3, 6, 6,'A', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(8, '09:00', 7, 3, 7, 7,'B', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+(7, '09:00', 6, 3, 6,'A', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(8, '09:00', 7, 3, 7,'B', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 ALTER TABLE time_block ALTER COLUMN id RESTART WITH 100;
 ALTER TABLE participant ALTER COLUMN id RESTART WITH 100;

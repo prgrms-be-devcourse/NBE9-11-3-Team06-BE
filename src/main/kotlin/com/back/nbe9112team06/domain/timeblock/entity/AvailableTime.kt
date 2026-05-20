@@ -1,7 +1,6 @@
 package com.back.nbe9112team06.domain.timeblock.entity
 
 import com.back.nbe9112team06.domain.meeting.entity.Meeting
-import com.back.nbe9112team06.domain.participant.entity.Participant
 import com.back.nbe9112team06.global.entity.BaseEntity
 import jakarta.persistence.*
 import java.time.LocalTime
@@ -21,10 +20,6 @@ class AvailableTime(
     @JoinColumn(name = "meeting_id")
     var meeting: Meeting,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participant_id")
-    var participant: Participant,
-
     var time: LocalTime,
 
     @Column(name = "created_by")
@@ -37,13 +32,11 @@ class AvailableTime(
             availableDateTime: AvailableDateTime,
             timeBlock: TimeBlock,
             meeting: Meeting,
-            participant: Participant,
             time: LocalTime,
         ): AvailableTime = AvailableTime(
             availableDateTime = availableDateTime,
             timeBlock = timeBlock,
             meeting = meeting,
-            participant = participant,
             time = time,
             createdBy = timeBlock.participant.guestName,
         )

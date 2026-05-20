@@ -1,7 +1,7 @@
 package com.back.nbe9112team06.domain.timetable.service
 
 import com.back.nbe9112team06.domain.adjustresult.entity.AdjustResult
-import com.back.nbe9112team06.domain.timeblock.repository.AvailableTimeRepository
+import com.back.nbe9112team06.domain.timeblock.repository.TimeBlockRepository
 import com.back.nbe9112team06.domain.timetable.entity.DateInfo
 import com.back.nbe9112team06.domain.timetable.entity.TimeInfo
 import com.back.nbe9112team06.domain.timetable.repository.TimeTableRepository
@@ -24,12 +24,13 @@ class TimeTableServiceUnitTest {
     lateinit var timeTableRepository: TimeTableRepository
 
     @MockK
-    lateinit var availableTimeRepository: AvailableTimeRepository
+    lateinit var  timeBlockRepository: TimeBlockRepository
 
     private val service by lazy {
         TimeTableService(
             timeTableRepository,
-            availableTimeRepository
+            timeBlockRepository,
+
         )
     }
 

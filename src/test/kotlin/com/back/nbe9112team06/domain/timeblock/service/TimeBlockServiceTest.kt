@@ -536,7 +536,7 @@ class TimeBlockServiceTest {
             val timeBlock = TimeBlock.create(meeting, participant)
             val adt = AvailableDateTime.create(timeBlock, meeting, date)
             times.forEach { t ->
-                val at = AvailableTime.create(adt, timeBlock, meeting, timeBlock.participant,t)
+                val at = AvailableTime.create(adt, timeBlock, meeting,t)
                 adt.availableTimes += at
             }
             timeBlock.availableDateTimes += adt
@@ -553,7 +553,7 @@ class TimeBlockServiceTest {
             dateToTimes.forEach { (date, times) ->
                 val adt = AvailableDateTime.create(timeBlock, meeting, date)
                 times.forEach { t ->
-                    val at = AvailableTime.create(adt, timeBlock, meeting, timeBlock.participant, t)
+                    val at = AvailableTime.create(adt, timeBlock, meeting, t)
                     adt.availableTimes += at
                 }
                 timeBlock.availableDateTimes += adt

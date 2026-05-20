@@ -72,7 +72,7 @@ class TimeBlockService(
             times.forEach { time ->
 
                 val availableTime =
-                    AvailableTime.create(availableDateTime, timeBlock, meeting, timeBlock.participant, time)
+                    AvailableTime.create(availableDateTime, timeBlock, meeting, time)
                 availableDateTime.availableTimes.add(availableTime)
                 availableTimeRepository.save(availableTime)
             }
