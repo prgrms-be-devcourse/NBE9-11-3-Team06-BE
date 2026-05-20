@@ -1,161 +1,182 @@
-//package com.back.nbe9112team06.domain.auth.service
-//
-//import com.back.nbe9112team06.domain.auth.dto.LoginRequest
-//import com.back.nbe9112team06.domain.member.entity.TimezoneType
-//import com.back.nbe9112team06.domain.member.service.MemberService
-//import com.back.nbe9112team06.global.error.ErrorCode
-//import com.back.nbe9112team06.global.exception.BusinessException
-//import com.back.nbe9112team06.global.security.JwtTokenProvider
-//import io.mockk.every
-//import io.mockk.junit5.MockKExtension
-//import io.mockk.mockk
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Nested
-//import org.junit.jupiter.api.Test
-//import org.junit.jupiter.api.extension.ExtendWith
-//import org.springframework.security.crypto.password.PasswordEncoder
-//import java.util.Optional
-//
-//@ExtendWith(MockKExtension::class)
-//@DisplayName("AuthService.login() 단위 테스트")
-//class AuthServiceTest {
-//
-//    // 🔹 의존성 모킹
-//    private val memberService = mockk<MemberService>()
-//    private val jwtTokenProvider = mockk<JwtTokenProvider>()
-//    private val passwordEncoder = mockk<PasswordEncoder>()
-//
-//    // 🔹 테스트 대상 (수동 주입)
-//    private lateinit var authService: AuthService
-//
-//    private companion object {
-//        private const val TEST_EMAIL = "test@example.com"
-//        private const val TEST_PASSWORD = "password123!"
-//        private const val TEST_NICKNAME = "테스터"
-//        private const val TEST_MEMBER_ID = 1L
-//        private const val MOCK_TOKEN = "mock.jwt.token"
-//    }
-//
-//    @BeforeEach
-//    fun setUp() {
-//        authService = AuthService(memberService, jwtTokenProvider, passwordEncoder)
-//    }
-//
-//    // ─────────────────────────────────────────
-//    // ✅ 성공 시나리오
-//    // ─────────────────────────────────────────
-//    @Nested
-//    @DisplayName("성공: 정상 로그인")
-//    inner class Success {
-//
-//        @Test
-//        fun `존재하는 이메일 + 올바른 비밀번호 → LoginResult 반환`() {
-//            // given: 테스트 데이터
-//            val member = createTestMember(id = TEST_MEMBER_ID, email = TEST_EMAIL)
-//
-//            // given: 모킹 설정
-//            every { memberService.findByEmail(TEST_EMAIL) } returns Optional.of(member)
-//            every { passwordEncoder.matches(TEST_PASSWORD, member.passwordHash) } returns true
-//            every { jwtTokenProvider.generateAccessToken(member) } returns MOCK_TOKEN
-//
-//            // when
-//            val result = authService.login(LoginRequest(TEST_EMAIL, TEST_PASSWORD))
-//
-//            // then: 결과 검증
-//            assertThat(result).isNotNull()
-//            assertThat(result.accessToken).isEqualTo(MOCK_TOKEN)
-//            assertThat(result.memberId).isEqualTo(TEST_MEMBER_ID)
-//            assertThat(result.nickname).isEqualTo(TEST_NICKNAME)
-//
-//            // then: 의존성 호출 검증
-//            verify(exactly = 1) { memberService.findByEmail(TEST_EMAIL) }
-//            verify(exactly = 1) { passwordEncoder.matches(TEST_PASSWORD, member.passwordHash) }
-//            verify(exactly = 1) { jwtTokenProvider.generateAccessToken(member) }
-//        }
-//    }
-//
-//    // ─────────────────────────────────────────
-//    // ❌ 실패 시나리오
-//    // ─────────────────────────────────────────
-//    @Nested
-//    @DisplayName("실패: 로그인 오류")
-//    inner class Failure {
-//
-//        @Test
-//        fun `존재하지 않는 이메일 → BusinessException 발생`() {
-//            // given
-//            every { memberService.findByEmail("ghost@example.com") } returns Optional.empty()
-//
-//            // when & then
-//            assertThatThrownBy {
-//                authService.login(LoginRequest("ghost@example.com", TEST_PASSWORD))
-//            }
-//                .isInstanceOf(BusinessException::class.java)
-//                .extracting("errorCode")
-//                .isEqualTo(ErrorCode.INVALID_LOGIN_CREDENTIALS.code)
-//
-//            // then: 비밀번호 검증, 토큰 발급은 절대 호출되지 않아야 함
-//            verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
-//            verify(exactly = 0) { jwtTokenProvider.generateAccessToken(any()) }
-//        }
-//
-//        @Test
-//        fun `비밀번호 불일치 → BusinessException 발생`() {
-//            // given
-//            val member = createTestMember(email = TEST_EMAIL)
-//            every { memberService.findByEmail(TEST_EMAIL) } returns Optional.of(member)
-//            every { passwordEncoder.matches("wrong!", member.passwordHash) } returns false
-//
-//            // when & then
-//            assertThatThrownBy {
-//                authService.login(LoginRequest(TEST_EMAIL, "wrong!"))
-//            }
-//                .isInstanceOf(BusinessException::class.java)
-//                .extracting("errorCode")
-//                .isEqualTo(ErrorCode.INVALID_LOGIN_CREDENTIALS.code)
-//
-//            // then: 토큰 발급은 호출되지 않아야 함 (실패 시 조기 리턴)
-//            verify(exactly = 0) { jwtTokenProvider.generateAccessToken(any()) }
-//        }
-//
-//        @Test
-//        fun `이메일 없음과 비밀번호 오류는 동일한 에러코드 반환 (보안)`() {
-//            // given
-//            val member = createTestMember(email = TEST_EMAIL)
-//            every { memberService.findByEmail(TEST_EMAIL) } returns Optional.of(member)
-//            every { passwordEncoder.matches(any(), any()) } returns false
-//            every { memberService.findByEmail("ghost@example.com") } returns Optional.empty()
-//
-//            // when: 두 경우의 에러코드 추출
-//            val codeForWrongEmail = runCatching {
-//                authService.login(LoginRequest("ghost@example.com", TEST_PASSWORD))
-//            }.exceptionOrNull()?.let { (it as BusinessException).errorCode }
-//
-//            val codeForWrongPassword = runCatching {
-//                authService.login(LoginRequest(TEST_EMAIL, "wrong!"))
-//            }.exceptionOrNull()?.let { (it as BusinessException).errorCode }
-//
-//            // then: 두 에러코드가 동일해야 함 (구체적 실패 원인 노출 금지)
-//            assertThat(codeForWrongEmail).isEqualTo(codeForWrongPassword)
-//            assertThat(codeForWrongEmail).isEqualTo(ErrorCode.INVALID_LOGIN_CREDENTIALS.code)
-//        }
-//    }
-//
-//    // ─────────────────────────────────────────
-//    // 🔧 헬퍼 함수 (테스트 데이터 빌더)
-//    // ─────────────────────────────────────────
-//    private fun createTestMember(
-//        id: Long = TEST_MEMBER_ID,
-//        email: String = TEST_EMAIL,
-//        passwordHash: String = "encoded_hash",
-//        nickname: String = TEST_NICKNAME
-//    ) = Member(
-//        id = id,
-//        email = email,
-//        passwordHash = passwordHash,
-//        nickname = nickname,
-//        timezone = TimezoneType.ASIA_SEOUL
-//        // 필요시 다른 필드 추가
-//    )
-//}
+package com.back.nbe9112team06.domain.auth.service
+
+import com.back.nbe9112team06.domain.auth.dto.LoginRequest
+import com.back.nbe9112team06.domain.member.entity.Member
+import com.back.nbe9112team06.domain.member.entity.TimezoneType
+import com.back.nbe9112team06.domain.member.repository.MemberRepository
+import com.back.nbe9112team06.global.exception.BusinessException
+import com.back.nbe9112team06.global.security.JwtTokenProvider
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.annotation.Transactional
+
+/**
+ * AuthService 단위 테스트
+ * - 로그인 성공/실패 비즈니스 로직 검증
+ * - 토큰 생성 결과 검증
+ * - HTTP 레이어 없음 (Cookie, MockMvc 불필요)
+ */
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+@DisplayName("AuthService 단위 테스트")
+class AuthServiceTest {
+    @Autowired
+    private lateinit var authService: AuthService
+
+    @Autowired
+    private lateinit var memberRepository: MemberRepository
+
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
+
+    @Autowired
+    private lateinit var jwtTokenProvider: JwtTokenProvider
+
+    private lateinit var savedMember: Member
+
+    @BeforeEach
+    fun setUp() {
+        savedMember = memberRepository.save(
+            Member(
+                TEST_EMAIL,
+                passwordEncoder.encode(TEST_PASSWORD)!!,
+                TEST_NICKNAME,
+                TimezoneType.ASIA_SEOUL
+            )
+        )
+    }
+
+    @Test
+    @DisplayName("t1: AuthService Bean 정상 주입")
+    fun t1_beanNotNull() {
+        assertThat(authService).isNotNull()
+    }
+
+    @Nested
+    @DisplayName("login - 로그인 성공")
+    inner class LoginSuccess {
+        @Test
+        @DisplayName("t2: 정상 로그인 → LoginResult 반환, accessToken 비어있지 않음")
+        fun t2_login_success_returnsLoginResult() {
+            // when
+            val result = authService.login(
+                LoginRequest(TEST_EMAIL, TEST_PASSWORD)
+            )
+
+            // then
+            assertThat(result).isNotNull()
+            assertThat(result.accessToken).isNotBlank()
+            assertThat(result.memberId).isEqualTo(savedMember.id)
+            assertThat(result.nickname).isEqualTo(TEST_NICKNAME)
+
+            println("accessToken = " + result.accessToken)
+        }
+
+        @Test
+        @DisplayName("t3: 로그인 성공 시 반환된 accessToken → payload에 id, nickname 포함")
+        fun t3_login_token_containsPayload() {
+            // when
+            val result = authService.login(
+                LoginRequest(TEST_EMAIL, TEST_PASSWORD)
+            )
+
+            // then: 토큰 파싱하여 페이로드 검증
+            val payload = jwtTokenProvider.getPayload(result.accessToken)
+            assertThat(payload).isNotNull()
+            assertThat(payload!!.get("id", Int::class.javaObjectType))
+                .isEqualTo(savedMember.id)
+            assertThat(payload.get("nickname", String::class.java))
+                .isEqualTo(TEST_NICKNAME)
+        }
+
+        @Test
+        @DisplayName("t4: 로그인 성공 시 accessToken payload에 email 미포함 (민감정보 보호)")
+        fun t4_login_token_noEmailInPayload() {
+            val result = authService.login(
+                LoginRequest(TEST_EMAIL, TEST_PASSWORD)
+            )
+
+            val payload = jwtTokenProvider.getPayload(result.accessToken)
+            assertThat(payload).isNotNull()
+            assertThat(payload!!.containsKey("email")).isFalse()
+            assertThat(payload.containsKey("passwordHash")).isFalse()
+        }
+    }
+
+    @Nested
+    @DisplayName("login - 로그인 실패")
+    internal inner class LoginFail {
+        @Test
+        @DisplayName("t5: 비밀번호 오류 → BusinessException(AUTH-004)")
+        fun t5_wrongPassword_throwsBusinessException() {
+            assertThatThrownBy {
+                authService.login(
+                    LoginRequest(
+                        TEST_EMAIL,
+                        "wrongPassword!"
+                    )
+                )
+            }
+                .isInstanceOf(BusinessException::class.java)
+                .satisfies({ ex: Throwable ->
+                    val be = ex as BusinessException
+                    assertThat(be.getErrorCode()).isEqualTo("AUTH-004")
+                })
+        }
+
+        @Test
+        @DisplayName("t6: 존재하지 않는 이메일 → BusinessException(AUTH-004)")
+        fun t6_notExistEmail_throwsBusinessException() {
+            assertThatThrownBy {
+                authService.login(
+                    LoginRequest(
+                        "ghost@example.com",
+                        TEST_PASSWORD
+                    )
+                )
+            }
+                .isInstanceOf(BusinessException::class.java)
+                .satisfies({ ex: Throwable ->
+                    val be = ex as BusinessException
+                    assertThat(be.getErrorCode()).isEqualTo("AUTH-004")
+                })
+        }
+
+        @Test
+        @DisplayName("t7: 이메일 없음/비밀번호 오류 → 동일한 에러코드 (보안: 구분 안 함)")
+        fun t7_sameErrorCode_for_emailAndPasswordError() {
+            // 보안 원칙: 어느 쪽이 틀렸는지 노출하지 않음
+            var codeForWrongPassword: String? = null
+            var codeForWrongEmail: String? = null
+
+            try {
+                authService.login(LoginRequest(TEST_EMAIL, "wrongPassword!"))
+            } catch (e: BusinessException) {
+                codeForWrongPassword = e.getErrorCode()
+            }
+
+            try {
+                authService.login(LoginRequest("ghost@example.com", TEST_PASSWORD))
+            } catch (e: BusinessException) {
+                codeForWrongEmail = e.getErrorCode()
+            }
+
+            assertThat(codeForWrongPassword).isEqualTo(codeForWrongEmail)
+        }
+    }
+
+    companion object {
+        private const val TEST_EMAIL = "auth-service@example.com"
+        private const val TEST_PASSWORD = "password123!"
+        private const val TEST_NICKNAME = "서비스테스터"
+    }
+}
