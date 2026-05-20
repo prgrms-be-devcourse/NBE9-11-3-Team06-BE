@@ -1,6 +1,8 @@
 package com.back.nbe9112team06.domain.timeblock.service
 
+import com.back.nbe9112team06.domain.meeting.entity.Meeting
 import com.back.nbe9112team06.domain.meeting.service.MeetingService
+import com.back.nbe9112team06.domain.participant.entity.Participant
 import com.back.nbe9112team06.domain.participant.service.ParticipantService
 import com.back.nbe9112team06.domain.timeblock.dto.TimeBlockRequest
 import com.back.nbe9112team06.domain.timeblock.dto.TimeRangeResponse
@@ -15,11 +17,15 @@ import com.back.nbe9112team06.domain.timeblock.repository.TimeBlockRepository
 import com.back.nbe9112team06.domain.timetable.service.TimeTableService
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
+import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.dateTime
+import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver.FORMATTER
+import org.springframework.data.domain.Similarity.raw
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
@@ -33,16 +39,21 @@ class TimeBlockService(
     private val timeTableService: TimeTableService
 ) {
 
+    private fun authenticateGuest(
+        meetingId: Int,
+        guestName: String,
+        guestPassword: String,
+    ): Pair<Meeting, Participant> {
+        val meeting = meetingService.getMeetingOrThrow(meetingId)
+        val participant = participantService.findParticipantOrThrow(meeting, guestName, guestPassword)
+        return meeting to participant
+    }
+
     // 타임블록 등록
     @Transactional
     fun registerTimeBlock(meetingId: Int, request: TimeBlockRequest) {
-        // 이 모임이 존재하는지 (Meeting 존재)
-        val meeting = meetingService.getMeetingOrThrow(meetingId)
-        // 요청한 사람이 이 모임 참여자인지 (Participant 인증)
-        val participant = participantService.findParticipantOrThrow(
-            meeting,
-            request.guestName,
-            request.guestPassword,
+        val (meeting, participant) = authenticateGuest(
+            meetingId, request.guestName, request.guestPassword
         )
 
         // 시간표를 등록한 적이 있는지 (TimeBlock 중복)
@@ -51,7 +62,6 @@ class TimeBlockService(
         }
 
         // availableDateTime 검증
-        // TODO size는 중복확인 불가능하니 개선필요
         validateAvailableDateTime(request.availableDateTimes)
 
         // 날짜별 가능한 시간 목록 묶어서 Map 반환
@@ -88,14 +98,8 @@ class TimeBlockService(
     // 타임블록 삭제
     @Transactional
     fun deleteTImeBlock(meetingId: Int, request: TimeBlockDeleteRequest) {
-        // Meeting 존재 여부 확인
-        val meeting = meetingService.getMeetingOrThrow(meetingId)
-
-        // 요청한 사람이 이 모임 참여자인지 (Participant 인증)
-        val participant = participantService.findParticipantOrThrow(
-            meeting,
-            request.guestName,
-            request.guestPassword,
+        val (meeting, participant) = authenticateGuest(
+            meetingId, request.guestName, request.guestPassword
         )
 
         // 삭제할 TimeBlock 가 없으면 예외
@@ -155,7 +159,7 @@ class TimeBlockService(
 
     // 검증 메서드
     internal fun validateAvailableDateTime(availableDateTimes: List<String>) {
-        // 중복 검증  size로 재는거는 중복확인이 불가능하다
+        // size -> 날짜 형식 -> 과거 날짜 -> %30으로 걸러내서 여기서는 size()가 맞다
         if (availableDateTimes.toSet().size != availableDateTimes.size) {
             throw BusinessException(ErrorCode.INVALID_REQUEST_PARAMETER, "시간 선택이 중복되었습니다.")
         }
