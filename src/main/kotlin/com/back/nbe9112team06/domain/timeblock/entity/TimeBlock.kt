@@ -17,13 +17,10 @@ class TimeBlock(
     @JoinColumn(name = "participant_id")
     var participant: Participant,
 
-    @Column(name = "created_by")
-    var createdBy: String,
-
     ) : BaseEntity() {
 
     @OneToMany(mappedBy = "timeBlock", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @BatchSize(size = 100)
+    @BatchSize(size = 50)
     val availableDateTimes: MutableList<AvailableDateTime> = mutableListOf()
 
     companion object {
@@ -31,7 +28,6 @@ class TimeBlock(
             TimeBlock(
                 meeting = meeting,
                 participant = participant,
-                createdBy = participant.guestName,
             )
     }
 }

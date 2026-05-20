@@ -17,7 +17,7 @@ class TimeTable() : BaseEntity() {
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     )
-    @BatchSize(size = 100)
+    @BatchSize(size = 50)
      var dateInfos: MutableList<DateInfo> = mutableListOf()
 
     constructor(
@@ -27,6 +27,4 @@ class TimeTable() : BaseEntity() {
         this.meeting = meeting
         this.dateInfos = dateInfos
     }
-
-
 }

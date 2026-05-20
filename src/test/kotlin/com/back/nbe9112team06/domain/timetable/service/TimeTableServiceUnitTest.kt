@@ -1,18 +1,13 @@
 package com.back.nbe9112team06.domain.timetable.service
 
-import com.back.nbe9112team06.domain.adjustresult.entity.AdjustResult
 import com.back.nbe9112team06.domain.timeblock.repository.TimeBlockRepository
-import com.back.nbe9112team06.domain.timetable.entity.DateInfo
-import com.back.nbe9112team06.domain.timetable.entity.TimeInfo
 import com.back.nbe9112team06.domain.timetable.repository.TimeTableRepository
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.time.LocalDate
 import java.time.LocalTime
 
 
@@ -27,24 +22,22 @@ class TimeTableServiceUnitTest {
     lateinit var timeBlockRepository: TimeBlockRepository
 
     private val service by lazy {
-        TimeTableService(
-            timeTableRepository,
-            timeBlockRepository
-        )
+        TimeTableService(timeTableRepository, timeBlockRepository)
     }
+
+    // ── findConsecutiveTimeGroups 핵심 로직 테스트 ──────────────────────────
 
     @Test
     fun 연속된_30분_시간은_하나의_그룹으로_묶인다() {
-
         // given
-        val slots = listOf(
-            createTimeInfo("09:00"),
-            createTimeInfo("09:30"),
-            createTimeInfo("10:00")
+        val times = listOf(
+            LocalTime.of(9, 0),
+            LocalTime.of(9, 30),
+            LocalTime.of(10, 0)
         )
 
         // when
-        val result = service.groupConsecutiveSlots(slots)
+        val result = service.findConsecutiveTimeGroups(times)
 
         // then
         assertThat(result).hasSize(1)
@@ -53,16 +46,15 @@ class TimeTableServiceUnitTest {
 
     @Test
     fun 비연속_시간은_다른_그룹으로_분리된다() {
-
         // given
-        val slots = listOf(
-            createTimeInfo("09:00"),
-            createTimeInfo("09:30"),
-            createTimeInfo("11:00")
+        val times = listOf(
+            LocalTime.of(9, 0),
+            LocalTime.of(9, 30),
+            LocalTime.of(11, 0)  // 비연속
         )
 
         // when
-        val result = service.groupConsecutiveSlots(slots)
+        val result = service.findConsecutiveTimeGroups(times)
 
         // then
         assertThat(result).hasSize(2)
@@ -72,80 +64,119 @@ class TimeTableServiceUnitTest {
 
     @Test
     fun 빈_리스트는_빈그룹을_반환한다() {
+        val result = service.findConsecutiveTimeGroups(emptyList())
 
-        // when
-        val result = service.groupConsecutiveSlots(emptyList())
-
-        // then
         assertThat(result).isEmpty()
     }
 
     @Test
-    fun recommend용_연속슬롯_1시간_추천검증() {
-
+    fun 단일_시간은_크기1인_그룹_하나를_반환한다() {
         // given
-        val dateInfo = createDateInfo(
-            listOf(
-                createTimeInfo("09:00", 2),
-                createTimeInfo("09:30", 2)
-            )
+        val times = listOf(LocalTime.of(10, 0))
+
+        // when
+        val result = service.findConsecutiveTimeGroups(times)
+
+        // then
+        assertThat(result).hasSize(1)
+        assertThat(result[0]).hasSize(1)
+        assertThat(result[0][0]).isEqualTo(LocalTime.of(10, 0))
+    }
+
+    @Test
+    fun 연속그룹이_여러개_있을때_모두_분리된다() {
+        // given: 09:00~09:30, 11:00~11:30, 14:00 각각 분리
+        val times = listOf(
+            LocalTime.of(9, 0),
+            LocalTime.of(9, 30),
+            LocalTime.of(11, 0),
+            LocalTime.of(11, 30),
+            LocalTime.of(14, 0)
         )
 
         // when
-        val groups = service.groupConsecutiveSlots(
-            dateInfo.timeInfos.sortedBy { it.time }
-        )
+        val result = service.findConsecutiveTimeGroups(times)
 
         // then
-        assertThat(groups).hasSize(1)
-        assertThat(groups[0]).hasSize(2)
-
-        val first = groups[0].first()
-        val last = groups[0].last()
-
-        assertThat(first.time).isEqualTo(LocalTime.parse("09:00"))
-        assertThat(last.time).isEqualTo(LocalTime.parse("09:30"))
-
-        val minCount = groups[0]
-            .minOf { it.adjustResultList.size }
-
-        assertThat(minCount).isEqualTo(2)
+        assertThat(result).hasSize(3)
+        assertThat(result[0]).hasSize(2)  // 09:00~09:30
+        assertThat(result[1]).hasSize(2)  // 11:00~11:30
+        assertThat(result[2]).hasSize(1)  // 14:00
     }
 
-    private fun createDateInfo(
-        timeInfos: List<TimeInfo>
-    ): DateInfo {
-
-        val dateInfo = DateInfo(
-            timeTable = mockk(),
-            date = LocalDate.parse("2024-05-20")
+    @Test
+    fun 각_그룹의_첫번째와_마지막_시간이_정확하다() {
+        // given
+        val times = listOf(
+            LocalTime.of(9, 0),
+            LocalTime.of(9, 30),
+            LocalTime.of(10, 0),
+            LocalTime.of(13, 0),
+            LocalTime.of(13, 30)
         )
 
-        dateInfo.timeInfos.addAll(timeInfos)
+        // when
+        val result = service.findConsecutiveTimeGroups(times)
 
-        return dateInfo
+        // then
+        assertThat(result[0].first()).isEqualTo(LocalTime.of(9, 0))
+        assertThat(result[0].last()).isEqualTo(LocalTime.of(10, 0))
+        assertThat(result[1].first()).isEqualTo(LocalTime.of(13, 0))
+        assertThat(result[1].last()).isEqualTo(LocalTime.of(13, 30))
     }
 
-    private fun createTimeInfo(
-        time: String,
-        participantCount: Int = 0
-    ): TimeInfo {
-
-        val timeInfo = TimeInfo(
-            dateInfo = mockk(),
-            time = LocalTime.parse(time)
+    @Test
+    fun 그룹내_슬라이딩_윈도우_크기2_검증() {
+        // given: windowSize=2 (1시간 미팅 가정)
+        val times = listOf(
+            LocalTime.of(9, 0),
+            LocalTime.of(9, 30),
+            LocalTime.of(10, 0)
         )
+        val windowSize = 2
 
-        repeat(participantCount) {
-
-            timeInfo.adjustResultList.add(
-                AdjustResult(
-                    timeInfo,
-                    "user$it"
-                )
-            )
+        // when
+        val groups = service.findConsecutiveTimeGroups(times)
+        val windows = mutableListOf<List<LocalTime>>()
+        for (group in groups) {
+            if (group.size < windowSize) continue
+            for (i in 0..group.size - windowSize) {
+                windows.add(group.subList(i, i + windowSize))
+            }
         }
 
-        return timeInfo
+        // then: (09:00~09:30), (09:30~10:00) 총 2개 윈도우
+        assertThat(windows).hasSize(2)
+        assertThat(windows[0]).containsExactly(
+            LocalTime.of(9, 0),
+            LocalTime.of(9, 30)
+        )
+        assertThat(windows[1]).containsExactly(
+            LocalTime.of(9, 30),
+            LocalTime.of(10, 0)
+        )
+    }
+
+    @Test
+    fun 그룹크기가_윈도우크기보다_작으면_슬라이딩_불가() {
+        // given: windowSize=3, 그룹크기=2
+        val times = listOf(
+            LocalTime.of(9, 0),
+            LocalTime.of(9, 30)
+        )
+        val windowSize = 3
+
+        // when
+        val groups = service.findConsecutiveTimeGroups(times)
+        val windows = mutableListOf<List<LocalTime>>()
+        for (group in groups) {
+            if (group.size < windowSize) continue
+            for (i in 0..group.size - windowSize) {
+                windows.add(group.subList(i, i + windowSize))
+            }
+        }
+
+        // then
+        assertThat(windows).isEmpty()
     }
 }

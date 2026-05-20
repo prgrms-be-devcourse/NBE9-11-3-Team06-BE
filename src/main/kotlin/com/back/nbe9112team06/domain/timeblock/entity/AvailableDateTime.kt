@@ -19,13 +19,10 @@ class AvailableDateTime(
 
     var date: LocalDate,
 
-    @Column(name = "created_by")
-    var createdBy: String,
-
     ) : BaseEntity() {
 
     @OneToMany(mappedBy = "availableDateTime", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @BatchSize(size = 100)
+    @BatchSize(size = 50)
     val availableTimes: MutableList<AvailableTime> = mutableListOf()
 
     companion object {
@@ -34,7 +31,6 @@ class AvailableDateTime(
                 timeBlock = timeBlock,
                 meeting = meeting,
                 date = date,
-                createdBy = timeBlock.participant.guestName,
             )
     }
 }

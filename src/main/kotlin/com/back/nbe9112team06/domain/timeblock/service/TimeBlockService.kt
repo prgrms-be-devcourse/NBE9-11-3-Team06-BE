@@ -57,7 +57,7 @@ class TimeBlockService(
         )
 
         // 시간표를 등록한 적이 있는지 (TimeBlock 중복)
-        timeBlockRepository.findByMeetingAndParticipant(meeting, participant)?.let {
+        timeBlockRepository.findByMeetingIdAndParticipantId(meetingId, participant.id)?.let {
             throw BusinessException(ErrorCode.DUPLICATE_RESOURCE, "시간표가 이미 등록되었습니다.")
         }
 
@@ -80,9 +80,13 @@ class TimeBlockService(
             availableDateTimeRepository.save(availableDateTime)
 
             times.forEach { time ->
-
-                val availableTime =
-                    AvailableTime.create(availableDateTime, timeBlock, meeting, time)
+                val availableTime = AvailableTime(
+                    availableDateTime = availableDateTime,
+                    timeBlock = timeBlock,
+                    meeting = meeting,
+                    participant = participant,
+                    time = time
+                )
                 availableDateTime.availableTimes.add(availableTime)
                 availableTimeRepository.save(availableTime)
             }
@@ -99,7 +103,7 @@ class TimeBlockService(
         )
 
         // 삭제할 TimeBlock 가 없으면 예외
-        val timeBlock = timeBlockRepository.findByMeetingAndParticipant(meeting, participant)
+        val timeBlock = timeBlockRepository.findByMeetingAndParticipant(meetingId, participant.id)
             ?: throw BusinessException(ErrorCode.NOT_FOUND, "삭제할 시간이 없습니다.")
 
         // TimeBlock 먼저 삭제 (participant_id FK 제거), 이후 Participant 삭제
@@ -113,24 +117,22 @@ class TimeBlockService(
     // 참여자 목록
     @Transactional(readOnly = true)
     fun getParticipantSchedules(meetingId: Int): List<ParticipantsScheduleResponse> {
-        val timeBlocks = timeBlockRepository.findWithAll(meetingId)
+        val slots = timeBlockRepository.findScheduleSlotsByMeetingId(meetingId)
 
-        return timeBlocks.map { timeBlock ->
-            val name = timeBlock.participant.guestName
+        return slots
+            .groupBy { it.participantName }
+            .map { (name, participantSlots) ->
+                val dateToSlots = participantSlots
+                    .groupBy { it.date }
+                    .mapValues { (_, slots) -> slots.map { it.time }.sorted() }
+                    .toSortedMap()
 
-            // 날짜별로 시간 슬롯 모으기 (날짜 정렬 보장 위해 TreeMap)
-            val dateToSlots = timeBlock.availableDateTimes
-                .flatMap { adt -> adt.availableTimes.map { adt.date to it.time } }
-                .groupBy({ it.first }, { it.second })
-                .toSortedMap()
+                val ranges = dateToSlots.flatMap { (date, slots) ->
+                    toRanges(date, slots)  // 기존 헬퍼 함수 재사용
+                }
 
-            // 날짜별로 연속된 시간끼리 range 묶기
-            val ranges = dateToSlots.flatMap { (date, slots) ->
-                toRanges(date, slots.sorted())
+                ParticipantsScheduleResponse(name, ranges)
             }
-
-            ParticipantsScheduleResponse(name, ranges)
-        }
     }
 
     // 30분 단위 슬롯을 연속 구간 묶음
@@ -157,7 +159,7 @@ class TimeBlockService(
 
     // 검증 메서드
     internal fun validateAvailableDateTime(availableDateTimes: List<String>) {
-        // 중복 검증 (이미 검증된 값을 가져오므로 toSet().size를 이용해도 됨)
+        // size -> 날짜 형식 -> 과거 날짜 -> %30으로 걸러내서 여기서는 size()가 맞다
         if (availableDateTimes.toSet().size != availableDateTimes.size) {
             throw BusinessException(ErrorCode.INVALID_REQUEST_PARAMETER, "시간 선택이 중복되었습니다.")
         }
