@@ -157,27 +157,22 @@ class TimeBlockService(
 
     // 검증 메서드
     internal fun validateAvailableDateTime(availableDateTimes: List<String>) {
-        val seen = mutableSetOf<Long>()   // ← Long timestamp
+        // 중복 검증 (이미 검증된 값을 가져오므로 toSet().size를 이용해도 됨)
+        if (availableDateTimes.toSet().size != availableDateTimes.size) {
+            throw BusinessException(ErrorCode.INVALID_REQUEST_PARAMETER, "시간 선택이 중복되었습니다.")
+        }
+
         val now = LocalDateTime.now()
 
-        availableDateTimes.forEach { raw ->
-            // 파싱
+        availableDateTimes.forEach { dateTimeStr ->
+            // 날짜 형식 검증
             val dateTime = try {
-                LocalDateTime.parse(raw, FORMATTER)
+                LocalDateTime.parse(dateTimeStr, FORMATTER)
             } catch (e: DateTimeParseException) {
                 throw BusinessException(ErrorCode.INVALID_REQUEST_PARAMETER, "올바른 날짜 형식이 아닙니다.")
             }
 
-            // 중복 검증
-            val timestamp = dateTime.toEpochSecond(ZoneOffset.UTC)
-            if (!seen.add(timestamp)) {
-                throw BusinessException(
-                    ErrorCode.INVALID_REQUEST_PARAMETER,
-                    "시간 선택이 중복되었습니다: $raw",
-                )
-            }
-
-            // 과거 검증
+            // 과거 날짜 검증
             if (dateTime.isBefore(now)) {
                 throw BusinessException(
                     ErrorCode.INVALID_REQUEST_PARAMETER,
