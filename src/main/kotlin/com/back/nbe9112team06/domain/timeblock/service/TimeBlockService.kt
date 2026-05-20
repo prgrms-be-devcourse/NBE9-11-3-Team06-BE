@@ -17,12 +17,15 @@ import com.back.nbe9112team06.domain.timeblock.repository.TimeBlockRepository
 import com.back.nbe9112team06.domain.timetable.service.TimeTableService
 import com.back.nbe9112team06.global.error.ErrorCode
 import com.back.nbe9112team06.global.exception.BusinessException
+import com.sun.org.apache.xalan.internal.lib.ExsltDatetime.dateTime
 import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver.FORMATTER
+import org.springframework.data.domain.Similarity.raw
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
@@ -154,28 +157,27 @@ class TimeBlockService(
 
     // 검증 메서드
     internal fun validateAvailableDateTime(availableDateTimes: List<String>) {
-        // 중복 검증
-        val seen = mutableSetOf<String>()
-        availableDateTimes.forEach { dt ->
-            if (!seen.add(dt)) {
-                throw BusinessException(
-                    ErrorCode.INVALID_REQUEST_PARAMETER,
-                    "시간 선택이 중복되었습니다: $dt",
-                )
-            }
-        }
-
+        val seen = mutableSetOf<Long>()   // ← Long timestamp
         val now = LocalDateTime.now()
 
-        availableDateTimes.forEach { dateTimeStr ->
-            // 날짜 형식 검증
+        availableDateTimes.forEach { raw ->
+            // 파싱
             val dateTime = try {
-                LocalDateTime.parse(dateTimeStr, FORMATTER)
+                LocalDateTime.parse(raw, FORMATTER)
             } catch (e: DateTimeParseException) {
                 throw BusinessException(ErrorCode.INVALID_REQUEST_PARAMETER, "올바른 날짜 형식이 아닙니다.")
             }
 
-            // 과거 날짜 검증
+            // 중복 검증
+            val timestamp = dateTime.toEpochSecond(ZoneOffset.UTC)
+            if (!seen.add(timestamp)) {
+                throw BusinessException(
+                    ErrorCode.INVALID_REQUEST_PARAMETER,
+                    "시간 선택이 중복되었습니다: $raw",
+                )
+            }
+
+            // 과거 검증
             if (dateTime.isBefore(now)) {
                 throw BusinessException(
                     ErrorCode.INVALID_REQUEST_PARAMETER,
