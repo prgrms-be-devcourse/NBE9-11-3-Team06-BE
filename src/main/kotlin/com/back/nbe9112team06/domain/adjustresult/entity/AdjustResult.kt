@@ -12,7 +12,7 @@ class AdjustResult(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "time_id")
     var timeInfo: TimeInfo,
-    var name: String // 조정자 이름 또는 결과 식별자
+    var participantId: Int
 ) : BaseEntity() {
 
     //    @ManyToOne(fetch = FetchType.LAZY)

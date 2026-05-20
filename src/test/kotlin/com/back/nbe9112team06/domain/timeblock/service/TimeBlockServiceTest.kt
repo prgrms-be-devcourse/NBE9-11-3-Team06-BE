@@ -4,6 +4,7 @@ import com.back.nbe9112team06.domain.meeting.entity.Meeting
 import com.back.nbe9112team06.domain.meeting.service.MeetingService
 import com.back.nbe9112team06.domain.participant.entity.Participant
 import com.back.nbe9112team06.domain.participant.service.ParticipantService
+import com.back.nbe9112team06.domain.timeblock.dto.ParticipantScheduleSlot
 import com.back.nbe9112team06.domain.timeblock.dto.TimeBlockRequest
 import com.back.nbe9112team06.domain.timeblock.dto.request.TimeBlockDeleteRequest
 import com.back.nbe9112team06.domain.timeblock.entity.AvailableDateTime
@@ -65,10 +66,8 @@ class TimeBlockServiceTest {
         every { timeTableService.aggregate(any()) } just Runs
     }
 
-
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
-    // 과거 검증 통과용 미래 시점 문자열 생성
     private fun futureDateTimeString(plusDays: Long, hour: Int, minute: Int): String =
         LocalDateTime.now()
             .plusDays(plusDays)
@@ -84,7 +83,6 @@ class TimeBlockServiceTest {
     private fun newParticipant(id: Int, name: String, password: String): Participant =
         Participant(name, password).also { ReflectionTestUtils.setField(it, "id", id) }
 
-    // BusinessException의 errorCode가 일치하는지(status / code / message) 검증
     private fun assertBusinessException(
         throwable: Throwable,
         expectedErrorCode: ErrorCode,
@@ -93,16 +91,15 @@ class TimeBlockServiceTest {
         assertThat(throwable).isInstanceOf(BusinessException::class.java)
         val ex = throwable as BusinessException
 
-        // 피드백 반영: status, code, message 일치 검증
-        assertThat(ex.errorCode.code).isEqualTo(expectedErrorCode.code)      // code 비교
-        assertThat(ex.httpStatus).isEqualTo(expectedErrorCode.status)   // status 비교
+        assertThat(ex.errorCode.code).isEqualTo(expectedErrorCode.code)
+        assertThat(ex.httpStatus).isEqualTo(expectedErrorCode.status)
 
         messageContains?.let {
             assertThat(ex.message).contains(it)
         }
     }
 
-    //
+    // ─────────────────────────────────────────────
     @Nested
     @DisplayName("toRanges - 연속 30분 구간 묶기")
     inner class ToRanges {
@@ -173,11 +170,7 @@ class TimeBlockServiceTest {
 
             val thrown = catchThrowable { service.validateAvailableDateTime(listOf(dt, dt)) }
 
-            assertBusinessException(
-                thrown,
-                ErrorCode.INVALID_REQUEST_PARAMETER,
-                "시간 선택이 중복",
-            )
+            assertBusinessException(thrown, ErrorCode.INVALID_REQUEST_PARAMETER, "시간 선택이 중복")
         }
 
         @Test
@@ -186,11 +179,7 @@ class TimeBlockServiceTest {
                 service.validateAvailableDateTime(listOf("2026/04/20 14:00"))
             }
 
-            assertBusinessException(
-                thrown,
-                ErrorCode.INVALID_REQUEST_PARAMETER,
-                "올바른 날짜 형식",
-            )
+            assertBusinessException(thrown, ErrorCode.INVALID_REQUEST_PARAMETER, "올바른 날짜 형식")
         }
 
         @Test
@@ -204,24 +193,16 @@ class TimeBlockServiceTest {
 
             val thrown = catchThrowable { service.validateAvailableDateTime(listOf(past)) }
 
-            assertBusinessException(
-                thrown,
-                ErrorCode.INVALID_REQUEST_PARAMETER,
-                "과거",
-            )
+            assertBusinessException(thrown, ErrorCode.INVALID_REQUEST_PARAMETER, "과거")
         }
 
         @Test
         fun `30분 단위가 아니면 INVALID_REQUEST_PARAMETER 예외가 발생한다`() {
-            val dt = futureDateTimeString(1, 14, 15) // 14:15
+            val dt = futureDateTimeString(1, 14, 15)
 
             val thrown = catchThrowable { service.validateAvailableDateTime(listOf(dt)) }
 
-            assertBusinessException(
-                thrown,
-                ErrorCode.INVALID_REQUEST_PARAMETER,
-                "30분 단위",
-            )
+            assertBusinessException(thrown, ErrorCode.INVALID_REQUEST_PARAMETER, "30분 단위")
         }
 
         @Test
@@ -263,7 +244,6 @@ class TimeBlockServiceTest {
     @DisplayName("registerTimeBlock - 등록 흐름")
     inner class RegisterTimeBlock {
 
-        // ── 성공 시나리오 ──
         @Test
         fun `정상 등록이면 TimeBlock 1회, AvailableDateTime은 날짜 수만큼, AvailableTime은 슬롯 수만큼 저장된다`() {
             val meeting = newMeeting(1)
@@ -271,7 +251,8 @@ class TimeBlockServiceTest {
 
             every { meetingService.getMeetingOrThrow(1) } returns meeting
             every { participantService.findParticipantOrThrow(meeting, "김철수", "1234") } returns participant
-            every { timeBlockRepository.findByMeetingAndParticipant(meeting, participant) } returns null
+            // ✅ Projection 버전: meetingId + participantId 기반 조회
+            every { timeBlockRepository.findByMeetingIdAndParticipantId(1, 10) } returns null
             every { timeBlockRepository.save(any()) } answers { firstArg() }
             every { availableDateTimeRepository.save(any()) } answers { firstArg() }
             every { availableTimeRepository.save(any()) } answers { firstArg() }
@@ -293,7 +274,6 @@ class TimeBlockServiceTest {
             verify(exactly = 3) { availableTimeRepository.save(any<AvailableTime>()) }
         }
 
-        // ── 실패 시나리오 ──
         @Test
         fun `이미 등록된 TimeBlock이 있으면 DUPLICATE_RESOURCE 예외가 발생하고 저장은 호출되지 않는다`() {
             val meeting = newMeeting(2)
@@ -302,7 +282,8 @@ class TimeBlockServiceTest {
 
             every { meetingService.getMeetingOrThrow(2) } returns meeting
             every { participantService.findParticipantOrThrow(meeting, "홍길동", "pw") } returns participant
-            every { timeBlockRepository.findByMeetingAndParticipant(meeting, participant) } returns existing
+            // ✅ Projection 버전: meetingId + participantId 기반 조회
+            every { timeBlockRepository.findByMeetingIdAndParticipantId(2, 20) } returns existing
 
             val req = TimeBlockRequest(
                 guestName = "홍길동",
@@ -312,11 +293,7 @@ class TimeBlockServiceTest {
 
             val thrown = catchThrowable { service.registerTimeBlock(2, req) }
 
-            assertBusinessException(
-                thrown,
-                ErrorCode.DUPLICATE_RESOURCE,
-                "시간표가 이미 등록",
-            )
+            assertBusinessException(thrown, ErrorCode.DUPLICATE_RESOURCE, "시간표가 이미 등록")
 
             verify(exactly = 0) { timeBlockRepository.save(any()) }
             verify(exactly = 0) { availableDateTimeRepository.save(any()) }
@@ -331,7 +308,7 @@ class TimeBlockServiceTest {
 
             every { meetingService.getMeetingOrThrow(3) } returns meeting
             every { participantService.findParticipantOrThrow(meeting, "김중복", "pw") } returns participant
-            every { timeBlockRepository.findByMeetingAndParticipant(meeting, participant) } returns null
+            every { timeBlockRepository.findByMeetingIdAndParticipantId(3, 30) } returns null
 
             val req = TimeBlockRequest(
                 guestName = "김중복",
@@ -342,8 +319,6 @@ class TimeBlockServiceTest {
             val thrown = catchThrowable { service.registerTimeBlock(3, req) }
 
             assertBusinessException(thrown, ErrorCode.INVALID_REQUEST_PARAMETER)
-
-            // 검증 실패 시 저장은 호출되지 않아야 함
             verify(exactly = 0) { timeBlockRepository.save(any()) }
         }
 
@@ -351,12 +326,12 @@ class TimeBlockServiceTest {
         fun `availableDateTimes에 과거 시간이 있으면 INVALID_REQUEST_PARAMETER 예외가 발생한다`() {
             val meeting = newMeeting(4)
             val participant = newParticipant(40, "김과거", "pw")
-            val past = LocalDateTime.now().minusDays(1).withMinute(0).withSecond(0).withNano(0)
-                .format(formatter)
+            val past = LocalDateTime.now().minusDays(1)
+                .withMinute(0).withSecond(0).withNano(0).format(formatter)
 
             every { meetingService.getMeetingOrThrow(4) } returns meeting
             every { participantService.findParticipantOrThrow(meeting, "김과거", "pw") } returns participant
-            every { timeBlockRepository.findByMeetingAndParticipant(meeting, participant) } returns null
+            every { timeBlockRepository.findByMeetingIdAndParticipantId(4, 40) } returns null
 
             val req = TimeBlockRequest(
                 guestName = "김과거",
@@ -384,7 +359,8 @@ class TimeBlockServiceTest {
 
             every { meetingService.getMeetingOrThrow(1) } returns meeting
             every { participantService.findParticipantOrThrow(meeting, "이몽룡", "pw3") } returns participant
-            every { timeBlockRepository.findByMeetingAndParticipant(meeting, participant) } returns existing
+            // ✅ Projection 버전: meetingId + participantId 기반 조회
+            every { timeBlockRepository.findByMeetingAndParticipant(1, 10) } returns existing
             every { timeBlockRepository.delete(existing) } returns Unit
             every { participantService.deleteParticipant(participant) } returns Unit
 
@@ -403,30 +379,39 @@ class TimeBlockServiceTest {
 
             every { meetingService.getMeetingOrThrow(2) } returns meeting
             every { participantService.findParticipantOrThrow(meeting, "박영희", "pw2") } returns participant
-            every { timeBlockRepository.findByMeetingAndParticipant(meeting, participant) } returns null
+            // ✅ Projection 버전: meetingId + participantId 기반 조회
+            every { timeBlockRepository.findByMeetingAndParticipant(2, 20) } returns null
 
             val req = TimeBlockDeleteRequest(guestName = "박영희", guestPassword = "pw2")
 
             val thrown = catchThrowable { service.deleteTImeBlock(2, req) }
 
-            assertBusinessException(
-                thrown,
-                ErrorCode.NOT_FOUND,
-                "삭제할 시간이 없습니다",
-            )
+            assertBusinessException(thrown, ErrorCode.NOT_FOUND, "삭제할 시간이 없습니다")
 
             verify(exactly = 0) { timeBlockRepository.delete(any()) }
             verify(exactly = 0) { participantService.deleteParticipant(any()) }
         }
     }
 
+    // ─────────────────────────────────────────────
     @Nested
     @DisplayName("getParticipantSchedules - 참여자 일정 조회")
     inner class GetParticipantSchedules {
 
+        /**
+         * Projection 기반이므로 ScheduleSlotProjection 을 mockk 으로 만들어서 주입합니다.
+         * findWithAll 대신 findScheduleSlotsByMeetingId 를 stub 합니다.
+         */
+        private fun slot(name: String, date: LocalDate, time: LocalTime) =
+            io.mockk.mockk<ParticipantScheduleSlot> {
+                every { participantName } returns name
+                every { this@mockk.date } returns date
+                every { this@mockk.time } returns time
+            }
+
         @Test
-        fun `등록된 TimeBlock이 없으면 빈 리스트를 반환한다`() {
-            every { timeBlockRepository.findWithAll(1) } returns emptyList()
+        fun `등록된 슬롯이 없으면 빈 리스트를 반환한다`() {
+            every { timeBlockRepository.findScheduleSlotsByMeetingId(1) } returns emptyList()
 
             val result = service.getParticipantSchedules(1)
 
@@ -435,18 +420,14 @@ class TimeBlockServiceTest {
 
         @Test
         fun `참여자 1명의 연속된 시간이 하나의 range로 묶여 반환된다`() {
-            val meeting = newMeeting(1)
-            val participant = newParticipant(10, "김철수", "1234")
             val date = LocalDate.of(2026, 4, 20)
-
-            val timeBlock = buildTimeBlockWithSlots(
-                meeting = meeting,
-                participant = participant,
-                date = date,
-                times = listOf(LocalTime.of(14, 0), LocalTime.of(14, 30), LocalTime.of(15, 0)),
+            val slots = listOf(
+                slot("김철수", date, LocalTime.of(14, 0)),
+                slot("김철수", date, LocalTime.of(14, 30)),
+                slot("김철수", date, LocalTime.of(15, 0)),
             )
 
-            every { timeBlockRepository.findWithAll(1) } returns listOf(timeBlock)
+            every { timeBlockRepository.findScheduleSlotsByMeetingId(1) } returns slots
 
             val result = service.getParticipantSchedules(1)
 
@@ -459,24 +440,19 @@ class TimeBlockServiceTest {
 
         @Test
         fun `정렬되지 않은 시간 슬롯이 입력되어도 정렬된 결과로 반환된다`() {
-            val meeting = newMeeting(1)
-            val participant = newParticipant(10, "김무순서", "pw")
             val date = LocalDate.of(2026, 4, 20)
-
-            // 일부러 뒤죽박죽 순서로 넣음: 15:00, 14:00, 14:30
-            val timeBlock = buildTimeBlockWithSlots(
-                meeting = meeting,
-                participant = participant,
-                date = date,
-                times = listOf(LocalTime.of(15, 0), LocalTime.of(14, 0), LocalTime.of(14, 30)),
+            // 일부러 뒤죽박죽 순서
+            val slots = listOf(
+                slot("김무순서", date, LocalTime.of(15, 0)),
+                slot("김무순서", date, LocalTime.of(14, 0)),
+                slot("김무순서", date, LocalTime.of(14, 30)),
             )
 
-            every { timeBlockRepository.findWithAll(1) } returns listOf(timeBlock)
+            every { timeBlockRepository.findScheduleSlotsByMeetingId(1) } returns slots
 
             val result = service.getParticipantSchedules(1)
 
             assertThat(result).hasSize(1)
-            // 정렬되어 연속 구간으로 묶여야 함 (14:00 ~ 15:30)
             assertThat(result[0].availableTimeRanges).hasSize(1)
             assertThat(result[0].availableTimeRanges[0].startTime).isEqualTo(LocalTime.of(14, 0))
             assertThat(result[0].availableTimeRanges[0].endTime).isEqualTo(LocalTime.of(15, 30))
@@ -484,81 +460,36 @@ class TimeBlockServiceTest {
 
         @Test
         fun `여러 날짜가 뒤섞여 입력되어도 날짜 오름차순으로 반환된다`() {
-            val meeting = newMeeting(1)
-            val participant = newParticipant(10, "김여러날", "pw")
-
-            // 일부러 뒤집어 넣음: 4월 22일 먼저, 4월 20일 나중에
-            val timeBlock = buildTimeBlockWithMultipleDates(
-                meeting = meeting,
-                participant = participant,
-                dateToTimes = linkedMapOf(
-                    LocalDate.of(2026, 4, 22) to listOf(LocalTime.of(10, 0)),
-                    LocalDate.of(2026, 4, 20) to listOf(LocalTime.of(14, 0)),
-                ),
+            // 일부러 4월 22일을 먼저 넣음
+            val slots = listOf(
+                slot("김여러날", LocalDate.of(2026, 4, 22), LocalTime.of(10, 0)),
+                slot("김여러날", LocalDate.of(2026, 4, 20), LocalTime.of(14, 0)),
             )
 
-            every { timeBlockRepository.findWithAll(1) } returns listOf(timeBlock)
+            every { timeBlockRepository.findScheduleSlotsByMeetingId(1) } returns slots
 
             val result = service.getParticipantSchedules(1)
 
             assertThat(result).hasSize(1)
             assertThat(result[0].availableTimeRanges).hasSize(2)
-            // 날짜 오름차순 정렬되어야 함
             assertThat(result[0].availableTimeRanges[0].date).isEqualTo(LocalDate.of(2026, 4, 20))
             assertThat(result[0].availableTimeRanges[1].date).isEqualTo(LocalDate.of(2026, 4, 22))
         }
 
         @Test
         fun `여러 참여자의 일정이 각각 매핑되어 반환된다`() {
-            val meeting = newMeeting(1)
-            val p1 = newParticipant(10, "철수", "pw1")
-            val p2 = newParticipant(20, "영희", "pw2")
             val date = LocalDate.of(2026, 4, 20)
+            val slots = listOf(
+                slot("철수", date, LocalTime.of(14, 0)),
+                slot("영희", date, LocalTime.of(15, 0)),
+            )
 
-            val tb1 = buildTimeBlockWithSlots(meeting, p1, date, listOf(LocalTime.of(14, 0)))
-            val tb2 = buildTimeBlockWithSlots(meeting, p2, date, listOf(LocalTime.of(15, 0)))
-
-            every { timeBlockRepository.findWithAll(1) } returns listOf(tb1, tb2)
+            every { timeBlockRepository.findScheduleSlotsByMeetingId(1) } returns slots
 
             val result = service.getParticipantSchedules(1)
 
             assertThat(result).hasSize(2)
             assertThat(result.map { it.name }).containsExactlyInAnyOrder("철수", "영희")
-        }
-
-        // 단일 날짜로 TimeBlock 만들기
-        private fun buildTimeBlockWithSlots(
-            meeting: Meeting,
-            participant: Participant,
-            date: LocalDate,
-            times: List<LocalTime>,
-        ): TimeBlock {
-            val timeBlock = TimeBlock.create(meeting, participant)
-            val adt = AvailableDateTime.create(timeBlock, meeting, date)
-            times.forEach { t ->
-                val at = AvailableTime.create(adt, timeBlock, meeting, t)
-                adt.availableTimes += at
-            }
-            timeBlock.availableDateTimes += adt
-            return timeBlock
-        }
-
-        // 여러 날짜로 TimeBlock 만들기
-        private fun buildTimeBlockWithMultipleDates(
-            meeting: Meeting,
-            participant: Participant,
-            dateToTimes: Map<LocalDate, List<LocalTime>>,
-        ): TimeBlock {
-            val timeBlock = TimeBlock.create(meeting, participant)
-            dateToTimes.forEach { (date, times) ->
-                val adt = AvailableDateTime.create(timeBlock, meeting, date)
-                times.forEach { t ->
-                    val at = AvailableTime.create(adt, timeBlock, meeting, t)
-                    adt.availableTimes += at
-                }
-                timeBlock.availableDateTimes += adt
-            }
-            return timeBlock
         }
     }
 }
